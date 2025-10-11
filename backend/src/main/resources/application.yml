@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: backend
+  r2dbc:
+    url: r2dbc:{postgres.url}
+    username: su
+    password: su
+  flyway:
+    url: jdbc:{postgres.url}
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
+    baseline-on-migrate: true
+postgres:
+  url: postgresql://localhost:5432/scrumdb
+token:
+  signing:
+    key: C4WYY2KCAGP9STF0YDCGYB71JAJ6QA28T30BWAKVFFJ2IWOC16IK9IYUAMI5E76L

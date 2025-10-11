@@ -1,0 +1,18 @@
+buildscript {
+    ext {
+        springBootVersion = '3.5.6'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+allprojects {
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.tyuiu'
+    version = '0.0.1-SNAPSHOT'
+}

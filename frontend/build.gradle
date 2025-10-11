@@ -1,0 +1,32 @@
+plugins {
+    id("com.github.node-gradle.node") version "2.2.0"}
+
+node {
+    version = '20.19.5'
+
+    npmVersion = '10.8.2'
+
+    distBaseUrl = 'https://nodejs.org/dist'
+
+    download = true
+
+    workDir = file("${project.layout.buildDirectory.get()}/nodejs")
+
+    npmWorkDir = file("${project.layout.buildDirectory.get()}/npm")
+
+    nodeModulesDir = file("${project.projectDir}")
+}
+
+
+tasks.register('npmBuild', NpmTask) {
+    dependsOn 'npmInstall'
+    dependsOn 'clean'
+
+    args = ['run', 'build']
+}
+
+tasks.register('clean') {
+    doFirst {
+        delete 'build/dist'
+    }
+}

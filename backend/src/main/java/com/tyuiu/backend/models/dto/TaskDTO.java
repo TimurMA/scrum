@@ -15,10 +15,13 @@ public class TaskDTO {
     private String boardId;
     private String scrumId;
     private TaskTagDTO taskTag;
+    private String taskTagId;
     private String title;
     private LocalDateTime createdAt;
     private String description;
     private TaskStatus status;
     private UserDTO creator;
+    private String creatorId;
     private UserDTO executor;
+    private String executorId;
 }

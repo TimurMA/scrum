@@ -37,9 +37,16 @@ CREATE TABLE IF NOT EXISTS task_tag (
     color TEXT
 );
 
+CREATE TABLE IF NOT EXISTS board (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+    sprint_id TEXT REFERENCES sprint(id)
+
+    title TEXT NOT NULL,
+);
+
 CREATE TABLE IF NOT EXISTS task (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    sprint_id TEXT REFERENCES sprint (id),
+    board_id TEXT REFERENCES board (id),
     scrum_id TEXT REFERENCES scrum (id),
     task_tag_id TEXT REFERENCES task_tag (id),
     title TEXT NOT NULL,

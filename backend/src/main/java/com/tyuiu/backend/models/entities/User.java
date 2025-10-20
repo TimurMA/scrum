@@ -20,7 +20,7 @@ public class User implements UserDetails {
     private String id;
 
     private String email;
-    private String userName;
+    private String username;
     private String password;
 
     @Override
@@ -30,7 +30,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userName;
+        return username;
     }
 
     @Override

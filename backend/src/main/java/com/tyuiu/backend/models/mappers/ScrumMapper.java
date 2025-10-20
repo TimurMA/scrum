@@ -15,7 +15,6 @@ public interface ScrumMapper {
 
     ScrumMemberDTO toDTO(ScrumMember scrumMember);
 
-    @Mapping(target = "id", ignore = true)
     ScrumMember toEntity(ScrumMemberDTO scrumMemberDTO);
 
 }

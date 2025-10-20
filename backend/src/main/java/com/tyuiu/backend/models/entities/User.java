@@ -1,6 +1,5 @@
 package com.tyuiu.backend.models.entities;
 
-import com.tyuiu.backend.models.enums.Role;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -21,9 +20,8 @@ public class User implements UserDetails {
     private String id;
 
     private String email;
-    private String fullName;
+    private String userName;
     private String password;
-    private List<Role> roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -32,7 +30,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id;
+        return userName;
     }
 
     @Override

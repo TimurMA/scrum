@@ -7,10 +7,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskTagDTO {
+public class BoardDTO {
     private String id;
+    private String sprintId;
 
-    private String name;
-    private String color;
-    private String scrumId;
+    private String title;
 }

@@ -1,13 +1,24 @@
 package com.tyuiu.backend.models.dto;
 
+import com.tyuiu.backend.models.enums.TaskStatus;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskDTO {
     private String id;
-
     private String sprintId;
     private String scrumId;
-    private String name;
+    private TaskTagDTO taskTag;
+    private String title;
+    private LocalDateTime createdAt;
     private String description;
-    private String creatorId;
-    private String executorId;
-    private Integer workingHour;
+    private TaskStatus status;
+    private UserDTO creator;
+    private UserDTO executor;
 }

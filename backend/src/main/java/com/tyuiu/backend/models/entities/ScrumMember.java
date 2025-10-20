@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class ScrumMember {
     private String scrumId;
     private String userEmail;
-    private String scrumRole;
-    private LocalDateTime startDate;
+    private LocalDateTime startDate = LocalDateTime.now();
     private LocalDateTime finishDate;
 }

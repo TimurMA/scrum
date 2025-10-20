@@ -1,14 +1,15 @@
 package com.tyuiu.backend.models.dto;
 
-import com.tyuiu.backend.models.enums.Role;
+import lombok.*;
 
-import java.util.List;
-
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
     private String id;
 
     private String email;
-    private String fullName;
-    private String password;
-    private List<Role> roles;
+    private String userName;
 }

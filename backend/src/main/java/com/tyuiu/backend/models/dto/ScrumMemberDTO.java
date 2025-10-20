@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ScrumMemberDTO {
     private String scrumId;
+    private String userId;
     private String userEmail;
-    private String userFullName;
-    private String scrumRole;
+    private String userName;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
 }

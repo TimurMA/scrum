@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum TaskStatus {
     InBackLog("В бэклоге"),
-    OnModification("На редактировании"),
     NewTask("Новая"),
     InProgress("Выполняется"),
     OnVerification("Проверяется"),

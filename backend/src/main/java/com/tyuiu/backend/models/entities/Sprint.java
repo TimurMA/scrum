@@ -22,7 +22,6 @@ public class Sprint {
     private String report;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
-    private Integer workingHours;
     private SprintStatus status;
 
 }

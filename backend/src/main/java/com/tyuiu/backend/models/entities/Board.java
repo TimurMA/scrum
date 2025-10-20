@@ -1,6 +1,5 @@
 package com.tyuiu.backend.models.entities;
 
-
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -10,12 +9,11 @@ import org.springframework.data.relational.core.mapping.Table;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "task_tag")
-public class TaskTag {
+@Table(name = "scrum")
+public class Board {
     @Id
     private String id;
-    private String scrumId;
+    private String sprintId;
 
-    private String name;
-    private String color;
+    private String title;
 }

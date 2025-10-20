@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum ScrumStatus {
     ACTIVE("Активен"),
     DONE("Завершён"),
-    PAUSED("Заморожен"),
     DELETED("Удалён");
 
     private final String status;

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Task {
     @Id
     private String id;
-    private String boardId;
+    private String sprintId;
     private String scrumId;
     private String taskTagId;
     private String title;

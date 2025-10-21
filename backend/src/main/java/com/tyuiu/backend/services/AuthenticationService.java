@@ -5,7 +5,7 @@ import com.tyuiu.backend.models.requests.SignInRequest;
 import com.tyuiu.backend.models.requests.SignUpRequest;
 import com.tyuiu.backend.models.responses.JwtAuthResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class AuthenticationService {
     private final UserService userService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
+    private final ReactiveAuthenticationManager authenticationManager;
 
     public Mono<JwtAuthResponse> signUp(SignUpRequest request) {
 

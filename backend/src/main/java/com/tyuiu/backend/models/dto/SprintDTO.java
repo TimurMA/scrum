@@ -18,6 +18,5 @@ public class SprintDTO {
     private String report;
     private LocalDateTime startDate;
     private LocalDateTime finishDate;
-    private Integer workingHours;
     private SprintStatus status;
 }

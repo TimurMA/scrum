@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TaskDTO {
     private String id;
-    private String boardId;
+    private String sprintId;
     private String scrumId;
     private TaskTagDTO taskTag;
     private String taskTagId;

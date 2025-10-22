@@ -1,59 +1,51 @@
 CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    email TEXT NOT NULL,
-    user_name TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-)
+    id VARCHAR(36) DEFAULT CAST(RANDOM_UUID() AS VARCHAR(36)) NOT NULL PRIMARY KEY,
+    email CLOB NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password CLOB NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS scrum (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    name TEXT NOT NULL,
-    status TEXT
-    creator_id TEXT REFERENCES users (id)
+    id VARCHAR(36) DEFAULT CAST(RANDOM_UUID() AS VARCHAR(36)) NOT NULL PRIMARY KEY,
+    name CLOB NOT NULL,
+    status CLOB,
+    creator_id VARCHAR(36) REFERENCES users (id)
 );
 
 CREATE TABLE IF NOT EXISTS scrum_member (
-    scrum_id TEXT REFERENCES scrum (id),
-    user_email TEXT,
+    scrum_id VARCHAR(36) REFERENCES scrum (id),
+    user_email CLOB,
     start_date TIMESTAMP,
     finish_date TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS sprint (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    scrum_id TEXT REFERENCES scrum (id),
-    name TEXT NOT NULL,
-    goal TEXT,
-    report TEXT,
+    id VARCHAR(36) DEFAULT CAST(RANDOM_UUID() AS VARCHAR(36)) NOT NULL PRIMARY KEY,
+    scrum_id VARCHAR(36) REFERENCES scrum (id),
+    name CLOB NOT NULL,
+    goal CLOB,
+    report CLOB,
     start_date TIMESTAMP,
     finish_date TIMESTAMP,
-    status TEXT
+    status CLOB
 );
 
 CREATE TABLE IF NOT EXISTS task_tag (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    scrum_id TEXT REFERENCES scrum (id),
-    name TEXT NOT NULL,
-    color TEXT
-);
-
-CREATE TABLE IF NOT EXISTS board (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    sprint_id TEXT REFERENCES sprint(id)
-
-    title TEXT NOT NULL,
+    id VARCHAR(36) DEFAULT CAST(RANDOM_UUID() AS VARCHAR(36)) NOT NULL PRIMARY KEY,
+    scrum_id VARCHAR(36) REFERENCES scrum (id),
+    name CLOB NOT NULL,
+    color CLOB
 );
 
 CREATE TABLE IF NOT EXISTS task (
-    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-    board_id TEXT REFERENCES board (id),
-    scrum_id TEXT REFERENCES scrum (id),
-    task_tag_id TEXT REFERENCES task_tag (id),
-    title TEXT NOT NULL,
-    description TEXT,
-    status TEXT,
+    id VARCHAR(36) DEFAULT CAST(RANDOM_UUID() AS VARCHAR(36)) NOT NULL PRIMARY KEY,
+    sprint_id VARCHAR(36) REFERENCES sprint (id),
+    scrum_id VARCHAR(36) REFERENCES scrum (id),
+    task_tag_id VARCHAR(36) REFERENCES task_tag (id),
+    title CLOB NOT NULL,
+    description CLOB,
+    status CLOB,
     created_at TIMESTAMP,
-    creator_id TEXT REFERENCES users (id),
-    executor_id TEXT REFERENCES users (id)
+    creator_id VARCHAR(36) REFERENCES users (id),
+    executor_id VARCHAR(36) REFERENCES users (id)
 );
-

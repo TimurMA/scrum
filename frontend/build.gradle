@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.node-gradle.node") version "2.2.0"}
+    id("com.github.node-gradle.node") version "7.0.2"}
 
 node {
     version = '20.19.5'
@@ -13,20 +13,26 @@ node {
     workDir = file("${project.layout.buildDirectory.get()}/nodejs")
 
     npmWorkDir = file("${project.layout.buildDirectory.get()}/npm")
-
-    nodeModulesDir = file("${project.projectDir}")
 }
 
 
 tasks.register('npmBuild', NpmTask) {
     dependsOn 'npmInstall'
-    dependsOn 'clean'
-
     args = ['run', 'build']
+    inputs.files(
+            fileTree('src'),
+            fileTree('public'),
+            'package.json',
+            'vite.config.js',
+            'index.html'
+    )
+    outputs.dir('dist')
 }
 
 tasks.register('clean') {
     doFirst {
-        delete 'build/dist'
+        delete 'build'
+        delete 'dist'
+        delete 'node_modules'
     }
 }

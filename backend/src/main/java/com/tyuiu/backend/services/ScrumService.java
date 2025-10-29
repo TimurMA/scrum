@@ -2,6 +2,7 @@ package com.tyuiu.backend.services;
 
 import com.tyuiu.backend.models.dto.ScrumDTO;
 import com.tyuiu.backend.models.entities.Scrum;
+import com.tyuiu.backend.models.entities.ScrumMember;
 import com.tyuiu.backend.models.mappers.ScrumMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -23,6 +24,13 @@ public class ScrumService {
         return template.select(Scrum.class).all().map(scrumMapper::toDTO);
     }
 
+    public Flux<ScrumDTO> getAllScrums(String userEmail) {
+        return template.select(query(where("user_email").is(userEmail)), ScrumMember.class)
+                .flatMap(scrumMember -> template
+                        .selectOne(query(where("id").is(scrumMember.getScrumId())), Scrum.class))
+                .map(scrumMapper::toDTO);
+    }
+
     public Flux<ScrumDTO> getScrumsByCreatorId(String creatorId) {
         return template.select(query(where("creator_id").is(creatorId)), Scrum.class).map(scrumMapper::toDTO);
     }
@@ -31,11 +39,14 @@ public class ScrumService {
         return template.selectOne(query(where("id").is("id")), Scrum.class).map(scrumMapper::toDTO);
     }
 
-    public Mono<ScrumDTO> createScrum(ScrumDTO scrumDTO) {
-        return template.insert(scrumMapper.toEntity(scrumDTO)).map(scrumMapper::toDTO);
+    public Mono<ScrumDTO> createScrum(ScrumDTO scrumDTO, String creatorEmail) {
+        return template.insert(scrumMapper.toEntity(scrumDTO)).map(scrumMapper::toDTO)
+                .flatMap(scrum -> template
+                        .insert(ScrumMember.builder().scrumId(scrum.getId()).userEmail(creatorEmail).build())
+                        .thenReturn(scrum));
     }
 
-    public Mono<Void> deleteScrum(String scrumId) {
+    public Mono<Void> deleteScrum(String scrumId, String creatorId) {
         return template.delete(query(where("id").is(scrumId)), Scrum.class).then();
     }
 }

@@ -1,17 +1,10 @@
 package com.tyuiu.backend.models.enums;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-
-@Getter
-@RequiredArgsConstructor
 public enum TaskStatus {
-    InBackLog("В бэклоге"),
-    NewTask("Новая"),
-    InProgress("Выполняется"),
-    OnVerification("Проверяется"),
-    Done("Завершена");
-    private final String status;
+    InBackLog,
+    NewTask,
+    InProgress,
+    OnVerification,
+    Done
 
 }

@@ -34,16 +34,15 @@ public class AuthenticationService {
     }
 
     public Mono<JwtAuthResponse> signIn(SignInRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
-        ));
-
-        return userService.findByUsername(request.getUsername()).flatMap(userDetails -> {
-            var jwt = jwtService.generateToken(userDetails);
-            return Mono.just(new JwtAuthResponse(jwt));
-        });
-
-
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        ).flatMap(authentication -> userService.findByUsername(request.getUsername())
+                .flatMap(userDetails -> {
+                    var jwt = jwtService.generateToken(userDetails);
+                    return Mono.just(new JwtAuthResponse(jwt));
+                }));
     }
 }

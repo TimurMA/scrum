@@ -24,6 +24,10 @@ public class UserService implements ReactiveUserDetailsService {
         return userRepository.findByUsername(username).cast(UserDetails.class);
     }
 
+    public Mono<User> findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public Flux<UserDTO> getAllUsers() {
         return userRepository.findAll().map(userMapper::toDTO);
     }

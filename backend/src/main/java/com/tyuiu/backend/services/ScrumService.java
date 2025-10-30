@@ -36,7 +36,7 @@ public class ScrumService {
     }
 
     public Mono<ScrumDTO> getById(String id){
-        return template.selectOne(query(where("id").is("id")), Scrum.class).map(scrumMapper::toDTO);
+        return template.selectOne(query(where("id").is(id)), Scrum.class).map(scrumMapper::toDTO);
     }
 
     public Mono<ScrumDTO> createScrum(ScrumDTO scrumDTO, String creatorEmail) {
@@ -47,6 +47,6 @@ public class ScrumService {
     }
 
     public Mono<Void> deleteScrum(String scrumId, String creatorId) {
-        return template.delete(query(where("id").is(scrumId)), Scrum.class).then();
+        return template.delete(query(where("id").is(scrumId).and(where("creator_id").is(creatorId))), Scrum.class).then();
     }
 }

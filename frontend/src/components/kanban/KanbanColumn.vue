@@ -14,7 +14,7 @@
       </span>
     </div>
     
-    <div class="flex-grow">
+    <div class="flex-grow overflow-y-auto custom-scrollbar">
       <div v-if="tasks.length === 0" class="h-full flex items-center justify-center">
         <p class="text-gray-400 text-sm">Нет задач</p>
       </div>
@@ -34,7 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 import TaskCard from './TaskCard.vue'
 import type { Column, Task, TaskStatus } from '../../types'
 

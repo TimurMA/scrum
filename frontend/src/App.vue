@@ -18,9 +18,7 @@ const scrumStore = useScrumStore()
 const sprintStore = useSprintStore()
 const taskStore = useTaskStore()
 
-// Инициализация данных при монтировании приложения
 onMounted(() => {
-  // Инициализация данных для демонстрации
   authStore.initUsers()
   scrumStore.initScrums()
   sprintStore.initSprints()

@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="container mx-auto py-6 px-4">
+      <TabNavigation :tabs="tabs" />
+      
       <div class="flex justify-between items-center mb-6">
         <div class="kanban-header">
           <h1>{{ board?.title || 'Kanban доска' }}</h1>
@@ -16,9 +18,9 @@
         </BaseButton>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KanbanColumn
-          v-for="column in columns"
+          v-for="column in visibleColumns"
           :key="column.id"
           :column="column"
           :tasks="tasksByStatus[column.status]"
@@ -34,6 +36,7 @@
     >
       <TaskForm
         :task-id="selectedTaskId"
+        context="board"
         @submit="closeTaskForm"
         @cancel="closeTaskForm"
       />
@@ -42,12 +45,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useScrumBoard } from '../../composables/useScrumBoard'
 import KanbanColumn from '../../components/kanban/KanbanColumn.vue'
 import TaskForm from '../../components/kanban/TaskForm.vue'
 import BaseButton from '../../components/common/BaseButton.vue'
 import BaseModal from '../../components/common/BaseModal.vue'
+import TabNavigation from '../../components/common/TabNavigation.vue'
 
 import { useTaskStore } from '../../stores/taskStore'
 import { useScrumStore } from '../../stores/scrumStore'
@@ -73,6 +77,18 @@ const {
   openTaskForm,
   closeTaskForm
 } = useScrumBoard()
+
+// Tabs configuration
+const tabs = [
+  { name: 'backlog', label: 'Бэклог', path: '/backlog' },
+  { name: 'board', label: 'Доска', path: '/board/1' },
+  { name: 'sprints', label: 'Спринты', path: '/sprints' }
+]
+
+// Filter out the 'InBackLog' column
+const visibleColumns = computed(() => {
+  return columns.value.filter(column => column.status !== 'InBackLog')
+})
 
 onMounted(() => {
   authStore.initUsers()

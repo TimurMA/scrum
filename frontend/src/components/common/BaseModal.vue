@@ -1,6 +1,6 @@
 <template>
-  <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10" @click="closeOnOutsideClick">
-    <div class="bg-white rounded-lg shadow-md p-6 max-w-md w-full" @click.stop>
+  <div v-if="modelValue" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 overflow-y-auto" @click="closeOnOutsideClick">
+    <div :class="['bg-white rounded-lg shadow-md p-6 w-full my-4', sizeClass]" @click.stop>
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">{{ title }}</h2>
         <button 
@@ -13,16 +13,34 @@
         </button>
       </div>
       
-      <slot></slot>
+      <div class="modal-content max-h-[70vh] overflow-y-auto pr-1 custom-scrollbar">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 const props = defineProps<{
   modelValue: boolean
   title: string
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }>()
+
+const sizeClass = computed(() => {
+  switch (props.size) {
+    case 'sm':
+      return 'max-w-sm'
+    case 'lg':
+      return 'max-w-3xl'
+    case 'xl':
+      return 'max-w-5xl'
+    case 'md':
+    default:
+      return 'max-w-md'
+  }
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
@@ -32,3 +50,4 @@ const closeOnOutsideClick = () => {
   emit('update:modelValue', false)
 }
 </script>
+

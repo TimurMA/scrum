@@ -21,7 +21,7 @@
       
       <div 
         v-if="showDropdown" 
-        class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-auto"
+        class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-y-auto custom-scrollbar"
         @click.stop
       >
         <div 
@@ -102,3 +102,4 @@ watch(() => showDropdown.value, (isOpen) => {
   }
 })
 </script>
+

@@ -26,7 +26,7 @@
       
       <div
         v-if="showDropdown"
-        class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-auto"
+        class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-y-auto custom-scrollbar"
         @click.stop
       >
         <div
@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useTagManagement } from '../../composables/useTagManagement'
 
 const props = defineProps<{
@@ -81,7 +81,6 @@ const filteredTags = ref<Array<any>>([])
 const tagExists = ref(false)
 
 watch(() => props.modelValue, (newValue) => {
-  // Если modelValue - это ID тега, находим его имя
   const tag = projectTags.value.find(t => t.id === newValue)
   inputValue.value = tag ? tag.name : ''
 }, { immediate: true })
@@ -172,3 +171,4 @@ const selectTag = async (tagName: string) => {
   }
 }
 </script>
+

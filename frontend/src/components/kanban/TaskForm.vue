@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow-md p-6">
+  <div class="bg-white rounded-lg shadow-md p-6 custom-scrollbar max-h-[80vh] overflow-y-auto">
     <h2 class="text-lg font-semibold mb-4">{{ isEdit ? 'Редактировать задачу' : 'Создать задачу' }}</h2>
     
     <form @submit.prevent="handleSubmit">
@@ -19,11 +19,12 @@
         <textarea
           id="description"
           v-model="taskData.description"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px] resize-none overflow-hidden"
         ></textarea>
       </div>
       
       <StatusSelector
+        v-if="showStatusSelector && isEdit"
         id="status"
         v-model="taskData.status"
         label="Статус"
@@ -64,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useScrumStore } from '../../stores/scrumStore'
 import { useTaskStore } from '../../stores/taskStore'
 import { useAuthStore } from '../../stores/authStore'
@@ -76,7 +77,8 @@ import StatusSelector from './StatusSelector.vue'
 import UserSelector from './UserSelector.vue'
 
 const props = defineProps<{
-  taskId?: string
+  taskId?: string,
+  context?: 'backlog' | 'board'
 }>()
 
 const emit = defineEmits<{
@@ -104,7 +106,28 @@ const taskData = ref<TaskFormData>({
   taskTagId: ''
 })
 
+
+const autoResizeTextarea = () => {
+  setTimeout(() => {
+    const textarea = document.getElementById('description') as HTMLTextAreaElement
+    if (textarea) {
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + 'px'
+    }
+  }, 0)
+}
+
 const isEdit = computed(() => !!props.taskId)
+
+const showStatusSelector = computed(() => {
+  return !props.context
+})
+
+const getDefaultStatus = (): TaskStatus => {
+  if (props.context === 'backlog') return 'InBackLog'
+  if (props.context === 'board') return 'NewTask'
+  return 'NewTask'
+}
 
 const handleSubmit = () => {
   if (isEdit.value && props.taskId) {
@@ -128,7 +151,7 @@ const handleSubmit = () => {
     taskStore.addTask({
       title: taskData.value.title,
       description: taskData.value.description,
-      status: taskData.value.status,
+      status: getDefaultStatus(),
       executorId: taskData.value.executorId,
       taskTagId: taskData.value.taskTagId,
       boardId: taskStore.currentBoardId,
@@ -139,6 +162,10 @@ const handleSubmit = () => {
   
   emit('submit')
 }
+
+watch(() => taskData.value.description, () => {
+  autoResizeTextarea()
+})
 
 onMounted(() => {
   if (props.taskId) {
@@ -151,11 +178,13 @@ onMounted(() => {
         executorId: task.executorId || '',
         taskTagId: task.taskTagId || ''
       }
+      setTimeout(autoResizeTextarea, 50)
     }
   } else {
     if (authStore.currentUser) {
       taskData.value.executorId = authStore.currentUser.id
     }
+    taskData.value.status = getDefaultStatus()
   }
 })
 </script>

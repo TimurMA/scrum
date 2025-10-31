@@ -31,24 +31,30 @@ public class JwtAuthenticationFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
-        var jwt = authHeader.substring(BEARER_PREFIX.length());
-        var username = jwtService.extractUserName(jwt);
+        String jwt = authHeader.substring(BEARER_PREFIX.length());
 
-        if (!StringUtils.hasLength(username)) {
+        try {
+            String username = jwtService.extractUserName(jwt);
+
+            if (!StringUtils.hasLength(username) || !jwtService.isTokenValid(jwt)) {
+                return chain.filter(exchange);
+            }
+
+            return userService.findUserByUsername(username)
+                    .filter(user -> jwtService.isTokenValid(jwt, user))
+                    .flatMap(user -> {
+                        Authentication authToken = new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                user.getAuthorities()
+                        );
+
+                        return chain.filter(exchange)
+                                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authToken));
+                    })
+                    .switchIfEmpty(chain.filter(exchange));
+        } catch (Exception e) {
             return chain.filter(exchange);
         }
-
-        return userService.findByUsername(username)
-                .filter(userDetails -> jwtService.isTokenValid(jwt, userDetails))
-                .flatMap(userDetails -> {
-                    Authentication authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
-
-                    return chain.filter(exchange)
-                            .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authToken));
-                }).switchIfEmpty(chain.filter(exchange));
     }
 }

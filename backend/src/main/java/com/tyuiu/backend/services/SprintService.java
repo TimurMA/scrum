@@ -25,8 +25,8 @@ public class SprintService {
                 .map(sprintMapper::toDTO);
     }
 
-    public Mono<SprintDTO> getActiveSprints(String scrumId) {
-        return template.selectOne(query(where("scrum_id").is(scrumId)
+    public Flux<SprintDTO> getActiveSprints(String scrumId) {
+        return template.select(query(where("scrum_id").is(scrumId)
                 .and(where("status").is(SprintStatus.ACTIVE))), Sprint.class)
                 .map(sprintMapper::toDTO);
     }

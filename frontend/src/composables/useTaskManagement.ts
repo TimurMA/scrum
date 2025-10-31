@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
-import { useTaskStore } from '../stores/taskStore'
-import type { Task, TaskStatus } from '../types'
+import { useTaskStore } from '@stores/taskStore'
+import type { Task, TaskStatus } from '@/types'
 
 export function useTaskManagement() {
   const taskStore = useTaskStore()

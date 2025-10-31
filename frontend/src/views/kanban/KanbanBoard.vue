@@ -46,17 +46,17 @@
 
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { useScrumBoard } from '../../composables/useScrumBoard'
-import KanbanColumn from '../../components/kanban/KanbanColumn.vue'
-import TaskForm from '../../components/kanban/TaskForm.vue'
-import BaseButton from '../../components/common/BaseButton.vue'
-import BaseModal from '../../components/common/BaseModal.vue'
-import TabNavigation from '../../components/common/TabNavigation.vue'
+import { useScrumBoard } from '@composables/useScrumBoard'
+import KanbanColumn from '@components/kanban/KanbanColumn.vue'
+import TaskForm from '@components/kanban/TaskForm.vue'
+import BaseButton from '@components/common/BaseButton.vue'
+import BaseModal from '@components/common/BaseModal.vue'
+import TabNavigation from '@components/common/TabNavigation.vue'
 
-import { useTaskStore } from '../../stores/taskStore'
-import { useScrumStore } from '../../stores/scrumStore'
-import { useAuthStore } from '../../stores/authStore'
-import { useSprintStore } from '../../stores/sprintStore'
+import { useTaskStore } from '@stores/taskStore'
+import { useScrumStore } from '@stores/scrumStore'
+import { useAuthStore } from '@stores/authStore'
+import { useSprintStore } from '@stores/sprintStore'
 
 const taskStore = useTaskStore()
 const scrumStore = useScrumStore()

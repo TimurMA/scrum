@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useScrumStore } from '@/stores/scrumStore'
-import { useTaskStore } from '@/stores/taskStore'
-import { useSprintStore } from '@/stores/sprintStore'
+import { useScrumStore } from '@stores/scrumStore'
+import { useTaskStore } from '@stores/taskStore'
+import { useSprintStore } from '@stores/sprintStore'
 import type { TaskStatus } from '@/types'
 
 export function useScrumBoard() {

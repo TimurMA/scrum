@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
-import { useTaskStore } from '@/stores/taskStore'
-import { useScrumStore } from '@/stores/scrumStore'
+import { useTaskStore } from '@stores/taskStore'
+import { useScrumStore } from '@stores/scrumStore'
 import type { TaskTag } from '@/types'
 
 export function useTagManagement() {

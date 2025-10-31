@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import { useScrumStore } from '@/stores/scrumStore'
-import { useTaskStore } from '@/stores/taskStore'
+import { useAuthStore } from '@stores/authStore'
+import { useScrumStore } from '@stores/scrumStore'
+import { useTaskStore } from '@stores/taskStore'
 import type { ScrumStatus } from '@/types'
 
 export function useUserProfile() {

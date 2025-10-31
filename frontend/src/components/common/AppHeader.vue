@@ -18,8 +18,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import { useTaskStore } from '@/stores/taskStore'
+import { useAuthStore } from '@stores/authStore'
+import { useTaskStore } from '@stores/taskStore'
 
 const route = useRoute()
 const authStore = useAuthStore()

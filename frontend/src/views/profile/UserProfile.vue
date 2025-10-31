@@ -71,9 +71,9 @@
 </template>
 
 <script setup lang="ts">
-import { useUserProfile } from '../../composables/useUserProfile'
-import BaseButton from '../../components/common/BaseButton.vue'
-import BaseModal from '../../components/common/BaseModal.vue'
+import { useUserProfile } from '@composables/useUserProfile'
+import BaseButton from '@components/common/BaseButton.vue'
+import BaseModal from '@components/common/BaseModal.vue'
 
 const {
   showScrumForm,

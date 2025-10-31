@@ -72,10 +72,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import BaseButton from '../common/BaseButton.vue'
-import { useSprintStore } from '../../stores/sprintStore'
-import { useScrumStore } from '../../stores/scrumStore'
-import type { Sprint, SprintStatus } from '../../types'
+import BaseButton from '@components/common/BaseButton.vue'
+import { useSprintStore } from '@stores/sprintStore'
+import { useScrumStore } from '@stores/scrumStore'
+import type { Sprint, SprintStatus } from '@/types'
 
 interface Props {
   sprintId?: string

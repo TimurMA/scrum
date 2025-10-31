@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useTagManagement } from '../../composables/useTagManagement'
+import { useTagManagement } from '@composables/useTagManagement'
 
 const props = defineProps<{
   modelValue: string

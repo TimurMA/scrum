@@ -66,12 +66,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useScrumStore } from '../../stores/scrumStore'
-import { useTaskStore } from '../../stores/taskStore'
-import { useAuthStore } from '../../stores/authStore'
-import type { TaskStatus } from '../../types'
+import { useScrumStore } from '@stores/scrumStore'
+import { useTaskStore } from '@stores/taskStore'
+import { useAuthStore } from '@stores/authStore'
+import type { TaskStatus } from '@/types'
 
-import BaseButton from '../../components/common/BaseButton.vue'
+import BaseButton from '@components/common/BaseButton.vue'
 import TagSelector from './TagSelector.vue'
 import StatusSelector from './StatusSelector.vue'
 import UserSelector from './UserSelector.vue'

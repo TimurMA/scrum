@@ -37,9 +37,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useTaskStore } from '../../stores/taskStore'
-import { useAuthStore } from '../../stores/authStore'
-import type { Task } from '../../types'
+import { useTaskStore } from '@stores/taskStore'
+import { useAuthStore } from '@stores/authStore'
+import type { Task } from '@/types'
 
 const props = defineProps<{
   task: Task

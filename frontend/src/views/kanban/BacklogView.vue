@@ -61,16 +61,16 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import TaskCard from '../../components/kanban/TaskCard.vue'
-import TaskForm from '../../components/kanban/TaskForm.vue'
-import BaseButton from '../../components/common/BaseButton.vue'
-import BaseModal from '../../components/common/BaseModal.vue'
-import TabNavigation from '../../components/common/TabNavigation.vue'
+import TaskCard from '@components/kanban/TaskCard.vue'
+import TaskForm from '@components/kanban/TaskForm.vue'
+import BaseButton from '@components/common/BaseButton.vue'
+import BaseModal from '@components/common/BaseModal.vue'
+import TabNavigation from '@components/common/TabNavigation.vue'
 
-import { useTaskStore } from '../../stores/taskStore'
-import { useScrumStore } from '../../stores/scrumStore'
-import { useAuthStore } from '../../stores/authStore'
-import { useSprintStore } from '../../stores/sprintStore'
+import { useTaskStore } from '@stores/taskStore'
+import { useScrumStore } from '@stores/scrumStore'
+import { useAuthStore } from '@stores/authStore'
+import { useSprintStore } from '@stores/sprintStore'
 
 const router = useRouter()
 const route = useRoute()

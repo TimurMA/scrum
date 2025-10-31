@@ -144,10 +144,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import BaseButton from '../common/BaseButton.vue'
-import { useSprintStore } from '../../stores/sprintStore'
-import { useTaskStore } from '../../stores/taskStore'
-import type { Task, TaskStatus } from '../../types'
+import BaseButton from '@components/common/BaseButton.vue'
+import { useSprintStore } from '@stores/sprintStore'
+import { useTaskStore } from '@stores/taskStore'
+import type { Task, TaskStatus } from '@/types'
 
 interface Props {
   sprintId?: string

@@ -150,14 +150,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import BaseButton from '../../components/common/BaseButton.vue'
-import TabNavigation from '../../components/common/TabNavigation.vue'
-import BaseModal from '../../components/common/BaseModal.vue'
-import SprintForm from '../../components/sprint/SprintForm.vue'
-import SprintTasksManager from '../../components/sprint/SprintTasksManager.vue'
+import BaseButton from '@components/common/BaseButton.vue'
+import TabNavigation from '@components/common/TabNavigation.vue'
+import BaseModal from '@components/common/BaseModal.vue'
+import SprintForm from '@components/sprint/SprintForm.vue'
+import SprintTasksManager from '@components/sprint/SprintTasksManager.vue'
 
-import { useScrumStore } from '../../stores/scrumStore'
-import { useSprintStore } from '../../stores/sprintStore'
+import { useScrumStore } from '@stores/scrumStore'
+import { useSprintStore } from '@stores/sprintStore'
 
 const scrumStore = useScrumStore()
 const sprintStore = useSprintStore()

@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import TaskCard from './TaskCard.vue'
-import type { Column, Task, TaskStatus } from '../../types'
+import type { Column, Task, TaskStatus } from '@/types'
 
 const props = defineProps<{
   column: Column

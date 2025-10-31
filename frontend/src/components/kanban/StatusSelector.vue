@@ -38,8 +38,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useTaskStore } from '../../stores/taskStore'
-import type { TaskStatus } from '../../types'
+import { useTaskStore } from '@stores/taskStore'
+import type { TaskStatus } from '@/types'
 
 const props = defineProps<{
   modelValue: TaskStatus

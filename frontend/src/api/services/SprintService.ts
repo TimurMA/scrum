@@ -1,7 +1,14 @@
 import apiClient from '@api/client';
 import type { Sprint } from '@/types';
 
+const parseSprintDates = (sprint: any): Sprint => ({
+    ...sprint,
+    startDate: new Date(sprint.startDate),
+    finishDate: new Date(sprint.finishDate),
+});
+
 export const sprintService = {
+    // --- PUT --- //
     // Обновление спринта
     updateSprint: async (sprintData: Sprint): Promise<Sprint> => {
         const payload = {
@@ -11,15 +18,12 @@ export const sprintService = {
         };
         
         const response = await apiClient.put('/sprint/update', payload);
-        return {
-            ...response.data,
-            startDate: response.data.startDate ? new Date(response.data.startDate) : new Date(),
-            finishDate: response.data.finishDate ? new Date(response.data.finishDate) : new Date(),
-        };
+        return parseSprintDates(response.data);
     },
 
+    // --- POST --- //
     // Создание спринта
-    createSprint: async (sprintData: Sprint): Promise<Sprint> => {
+    createSprint: async (sprintData: Omit<Sprint, 'id'>): Promise<Sprint> => {
         const payload = {
             ...sprintData,
             startDate: sprintData.startDate?.toISOString(),
@@ -27,13 +31,10 @@ export const sprintService = {
         };
 
         const response = await apiClient.post('/sprint/create', payload);
-        return {
-            ...response.data,
-            startDate: response.data.startDate ? new Date(response.data.startDate) : new Date(),
-            finishDate: response.data.finishDate ? new Date(response.data.finishDate) : new Date(),
-        };
+        return parseSprintDates(response.data);
     },
 
+    // --- PATCH --- //
     // Старт спринта
     startSprint: (sprintId: string): Promise<void> => {
         return apiClient.patch(`/sprint/start/${sprintId}`);
@@ -46,26 +47,20 @@ export const sprintService = {
         });
     },
 
+    // --- GET --- //
     // Получение всех спринтов скрама
     getAllSprints: async (scrumId: string): Promise<Sprint[]> => {
         const response = await apiClient.get(`/sprint/all/${scrumId}`);
-        return response.data.map((sprint: any) => ({
-            ...sprint,
-            startDate: sprint.startDate ? new Date(sprint.startDate) : new Date(),
-            finishDate: sprint.finishDate ? new Date(sprint.finishDate) : new Date(),
-        }));
+        return response.data.map(parseSprintDates);
     },
 
     // Получение активных спринтов
     getActiveSprints: async (scrumId: string): Promise<Sprint[]> => {
         const response = await apiClient.get(`/sprint/active/${scrumId}`);
-        return response.data.map((sprint: any) => ({
-            ...sprint,
-            startDate: sprint.startDate ? new Date(sprint.startDate) : new Date(),
-            finishDate: sprint.finishDate ? new Date(sprint.finishDate) : new Date(),
-        }));
+        return response.data.map(parseSprintDates);
     },
 
+    // --- DELETE --- //
     // Удаление спринта
     deleteSprint: (sprintId: string): Promise<void> => {
         return apiClient.delete(`/sprint/delete/${sprintId}`);

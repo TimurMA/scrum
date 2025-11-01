@@ -1,15 +1,14 @@
 import apiClient from '@api/client';
-import {User} from '@/types'
 
 export const authService = {
     // --- POST --- //
     // Регистрация пользователя
-    signUp: (userData: {  username: string; email: string; password: string;}): Promise<{ token: string; user: User }> => {
+    signUp: (userData: {  username: string; email: string; password: string;}): Promise<{ token: string }> => {
         return apiClient.post('/auth/sign/up', userData).then(response => response.data);
     },
 
     // Авторизация пользователя
-    signIn: (credentials: { username: string; password: string }): Promise<{ token: string; user: User }> => {
+    signIn: (credentials: { username: string; password: string }): Promise<{ token: string }> => {
         return apiClient.post('/auth/sign/in', credentials).then(response => response.data);
     },
 

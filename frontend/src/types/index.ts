@@ -46,19 +46,21 @@ export interface TaskTag {
 
 export interface Task {
   id: string
-  boardId?: string
+  sprintId?: string
   scrumId: string
-  taskTagId?: string
   title: string
   description?: string
   status: TaskStatus
   createdAt: Date
-  creatorId: string
-  executorId?: string
+
+  taskTagId?: string
+  taskTag?: TaskTag
   
+  creatorId: string
   creator?: User
+  
+  executorId?: string
   executor?: User
-  tag?: TaskTag
 }
 
 export interface Board {

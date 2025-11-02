@@ -58,7 +58,7 @@
           <BaseButton
             type="submit"
             :loading="loading"
-            class="w-full"
+            class="w-full flex justify-center"
           >
             Войти
           </BaseButton>

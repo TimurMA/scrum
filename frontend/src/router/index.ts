@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw, NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
-import { authService } from '@/api/services/AuthService'
+import { authService } from '@api/services/AuthService'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -10,37 +10,37 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/auth/LoginView.vue'),
+    component: () => import('@views/auth/LoginView.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('@/views/auth/RegisterView.vue'),
+    component: () => import('@views/auth/RegisterView.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('@/views/profile/UserProfile.vue'),
+    component: () => import('@views/profile/UserProfile.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/board/:id',
     name: 'KanbanBoard',
-    component: () => import('@/views/kanban/KanbanBoard.vue'),
+    component: () => import('@views/kanban/KanbanBoard.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/backlog',
     name: 'Backlog',
-    component: () => import('@/views/kanban/BacklogView.vue'),
+    component: () => import('@views/kanban/BacklogView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/sprints',
     name: 'Sprints',
-    component: () => import('@/views/kanban/SprintsView.vue'),
+    component: () => import('@views/kanban/SprintsView.vue'),
     meta: { requiresAuth: true }
   }
 ]

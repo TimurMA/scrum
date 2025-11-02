@@ -154,7 +154,6 @@ const handleSubmit = () => {
       status: getDefaultStatus(),
       executorId: taskData.value.executorId,
       taskTagId: taskData.value.taskTagId,
-      boardId: taskStore.currentBoardId,
       scrumId: scrumStore.currentScrumId,
       creatorId: authStore.currentUser?.id || ''
     })

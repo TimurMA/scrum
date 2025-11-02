@@ -1,28 +1,41 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <AppHeader />
+  <component :is="layout">
     <router-view />
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import AppHeader from './components/common/AppHeader.vue'
+import { computed, onMounted, markRaw } from 'vue'
+import { useRoute } from 'vue-router'
+import MainLayout from '@/layouts/MainLayout.vue'
+import AuthLayout from '@/layouts/AuthLayout.vue'
 import { useAuthStore } from './stores/authStore'
 import { useScrumStore } from './stores/scrumStore'
 import { useSprintStore } from './stores/sprintStore'
 import { useTaskStore } from './stores/taskStore'
 
+const route = useRoute()
 const authStore = useAuthStore()
 const scrumStore = useScrumStore()
 const sprintStore = useSprintStore()
 const taskStore = useTaskStore()
 
+const layout = computed(() => {
+  if (route.path === '/login' || route.path === '/register') {
+    return markRaw(AuthLayout)
+  }
+  return markRaw(MainLayout)
+})
+
 onMounted(() => {
-  authStore.initUsers()
-  scrumStore.initScrums()
-  sprintStore.initSprints()
-  taskStore.initTasks()
+  if (authStore.isAuthenticated()) {
+    authStore.fetchCurrentUser().then(() => {
+      authStore.initUsers()
+      scrumStore.initScrums()
+      sprintStore.initSprints()
+      taskStore.initTasks()
+    })
+  }
 })
 </script>
 

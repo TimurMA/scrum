@@ -35,7 +35,7 @@ export const useTaskStore = defineStore('task', () => {
     tasks.value = [
       {
         id: '1',
-        boardId: '1',
+        sprintId: '1',
         scrumId: '1',
         taskTagId: '3',
         title: 'Написать документацию API',
@@ -47,7 +47,7 @@ export const useTaskStore = defineStore('task', () => {
       },
       {
         id: '2',
-        boardId: '1',
+        sprintId: '1',
         scrumId: '1',
         taskTagId: '1',
         title: 'Исправить баг с авторизацией',
@@ -59,7 +59,7 @@ export const useTaskStore = defineStore('task', () => {
       },
       {
         id: '3',
-        boardId: '1',
+        sprintId: '1',
         scrumId: '1',
         taskTagId: '2',
         title: 'Построить CI/CD пайплайн',
@@ -71,7 +71,7 @@ export const useTaskStore = defineStore('task', () => {
       },
       {
         id: '4',
-        boardId: '1',
+        sprintId: '1',
         scrumId: '1',
         taskTagId: '2',
         title: 'Оптимизировать запросы к БД',
@@ -83,7 +83,7 @@ export const useTaskStore = defineStore('task', () => {
       },
       {
         id: '5',
-        boardId: '1',
+        sprintId: '1',
         scrumId: '1',
         title: 'Новая задача',
         description: '',
@@ -110,7 +110,7 @@ export const useTaskStore = defineStore('task', () => {
     } as Record<TaskStatus, Task[]>
     
     tasks.value.forEach(task => {
-      if (task.boardId === currentBoardId.value) {
+      if (task.sprintId === currentBoardId.value) {
         if (!result[task.status]) {
           result[task.status] = []
         }

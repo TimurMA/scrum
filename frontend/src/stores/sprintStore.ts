@@ -103,10 +103,9 @@ export const useSprintStore = defineStore('sprint', () => {
     if (!currentSprint.value) return []
     
     const taskStore = useTaskStore()
-    return taskStore.tasks.filter(task => {
-      const board = taskStore.boards.find(board => board.sprintId === currentSprint.value?.id)
-      return task.boardId === board?.id
-    })
+    return taskStore.tasks.filter(task => 
+      task.sprintId === currentSprint.value?.id
+    )
   })
   
   const getSprintById = (id: string) => {
@@ -167,7 +166,7 @@ export const useSprintStore = defineStore('sprint', () => {
         taskStore.updateTask({
           ...task,
           status: 'NewTask',
-          boardId: board!.id
+          sprintId: sprintId
         })
       }
     })

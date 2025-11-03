@@ -148,7 +148,6 @@ const tabs = [
 
 onMounted(async () => {
   await authStore.initUsers();
-  await scrumStore.loadScrums();
 
   if (scrumStore.currentScrumId) {
     await Promise.all([

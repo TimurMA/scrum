@@ -254,7 +254,6 @@ const tabs = [
 ]
 
 onMounted(async () => {
-  const scrumStore = useScrumStore()
   if (scrumStore.currentScrumId) {
     await sprintStore.loadSprints(scrumStore.currentScrumId)
   }

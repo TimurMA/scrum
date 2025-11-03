@@ -79,15 +79,21 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
-import BaseButton from '@/components/common/BaseButton.vue';
+import { useAuthStore } from '@stores/authStore';
+import BaseButton from '@components/common/BaseButton.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const loading = ref(false);
 const error = ref('');
 
-const form = reactive({
+interface LoginForm {
+  username: string;
+  password: string;
+  remember: boolean;
+}
+
+const form = reactive<LoginForm>({
   username: '',
   password: '',
   remember: false
@@ -101,7 +107,15 @@ const handleLogin = async () => {
     await authStore.login(form.username, form.password);
     router.push({ name: 'Profile' });
   } catch (err: any) {
-    error.value = err.message || 'Ошибка при входе. Пожалуйста, проверьте свои данные.';
+    if (err.response?.status === 401) {
+      error.value = 'Неверное имя пользователя или пароль';
+    } else if (err.response?.status >= 500) {
+      error.value = 'Сервис временно недоступен. Попробуйте позже.';
+    } else if (err.message?.includes('Network Error')) {
+      error.value = 'Проблемы с подключением к интернету';
+    } else {
+      error.value = err.message || 'Ошибка при входе. Пожалуйста, проверьте свои данные.';
+    }
   } finally {
     loading.value = false;
   }

@@ -27,7 +27,7 @@ public class SprintService {
 
     public Flux<SprintDTO> getActiveSprints(String scrumId) {
         return template.select(query(where("scrum_id").is(scrumId)
-                .and(where("status").is(SprintStatus.ACTIVE))), Sprint.class)
+                .and(where("status").is(SprintStatus.Active))), Sprint.class)
                 .map(sprintMapper::toDTO);
     }
 
@@ -43,15 +43,15 @@ public class SprintService {
     }
 
     public Mono<Void> startSprint(String sprintId) {
-        return template.update(query(where("id").is(sprintId).and(where("status").is(SprintStatus.ACTIVE))),
-                        update("status", SprintStatus.DONE), Sprint.class)
+        return template.update(query(where("id").is(sprintId).and(where("status").is(SprintStatus.Active))),
+                        update("status", SprintStatus.Done), Sprint.class)
                 .then(template.update(query(where("id").is(sprintId)),
-                update("status", SprintStatus.ACTIVE), Sprint.class)).then();
+                update("status", SprintStatus.Active), Sprint.class)).then();
     }
 
     public Mono<Void> completeSprint(String sprintId, String report) {
         return template.update(query(where("id").is(sprintId)),
-                update("status", SprintStatus.DONE)
+                update("status", SprintStatus.Done)
                         .set("report", report), Sprint.class)
                 .then();
     }

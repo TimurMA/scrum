@@ -9,7 +9,7 @@ export const UserService = {
     },
     
     getCurrentUser: (): Promise<User> => {
-        return apiClient.get('/user/me').then(response => response.data);
+        return apiClient.get('/user/current').then(response => response.data);
     },
     
     getUserById: (userId: string): Promise<User> => {

@@ -1,7 +1,7 @@
 package com.tyuiu.backend.models.enums;
 
 public enum ScrumStatus {
-    ACTIVE,
-    DONE,
-    DELETED
+    Active,
+    Done,
+    Deleted
 }

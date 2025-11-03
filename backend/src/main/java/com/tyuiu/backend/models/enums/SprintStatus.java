@@ -2,6 +2,7 @@ package com.tyuiu.backend.models.enums;
 
 
 public enum SprintStatus {
-    ACTIVE,
-    DONE
+    NotActive,
+    Active,
+    Done
 }

@@ -1,5 +1,5 @@
 import apiClient from '@api/client';
-import {Task, TaskStatus} from '@/types'
+import {Task, TaskStatus, TaskTag} from '@/types'
 
 export const taskService = {
     // --- PUT --- //
@@ -12,7 +12,26 @@ export const taskService = {
         return apiClient.put('/task/change', payload);
     },
 
+    // --- POST --- //
+    // Создание задания
+    createTask: (taskData: Omit<Task, 'id' | 'createdAt'>): Promise<Task> => {
+        return apiClient.post('/task/create', taskData).then(response => ({
+            ...response.data,
+            createdAt: new Date(response.data.createdAt)
+        }));
+    },
+
+    // Создание тэга
+    createTag: (tagData: Omit<TaskTag, 'id'>): Promise<TaskTag> => {
+        return apiClient.post('/task/create/tag', tagData).then(response => response.data);
+    },
+
     // --- GET --- //
+    // Получение всех тэгов задач скрама
+    getScrumTags: (scrumId: string): Promise<TaskTag[]> => {
+        return apiClient.get(`/task/tag/all${scrumId}`).then(response => response.data);
+    },
+
     // Получение задач спринта
     getSprintTasks: (sprintId: string): Promise<Task[]> => {
         return apiClient.get(`/task/sprint/${sprintId}`).then(response => 
@@ -47,18 +66,6 @@ export const taskService = {
 
             return groupedTasks;
         });
-    },
-
-    // --- POST --- //
-    // Создание задачи
-    createTask: (taskData: Omit<Task, 'id' | 'createdAt'>): Promise<Task> => {
-        const payload = {
-            ...taskData,
-        };
-        return apiClient.post('/task/create', payload).then(response => ({
-            ...response.data,
-            createdAt: new Date(response.data.createdAt)
-        }));
     },
 
     // --- DELETE --- //

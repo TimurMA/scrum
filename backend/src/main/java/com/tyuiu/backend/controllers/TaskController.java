@@ -40,7 +40,7 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    @Operation(summary = "Создание задания")
+    @Operation(summary = "Создание задачи")
     public Mono<TaskDTO> createTask(@RequestBody TaskDTO taskDTO) {
         return taskService.createTask(taskDTO);
     }

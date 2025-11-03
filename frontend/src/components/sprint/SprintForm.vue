@@ -61,12 +61,18 @@
         <BaseButton
           variant="primary"
           type="submit"
-          :disabled="!!dateError"
+          :loading="sprintStore.isLoading"
+          :disabled="!!dateError || sprintStore.isLoading"
         >
           {{ isEdit ? 'Сохранить' : 'Создать' }}
         </BaseButton>
       </div>
     </form>
+    
+    <!-- Error Message -->
+    <div v-if="sprintStore.error" class="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+      <p class="text-red-600 text-sm">{{ sprintStore.error }}</p>
+    </div>
   </div>
 </template>
 
@@ -114,7 +120,7 @@ const parseStringToDate = (dateString: string): Date => {
 const sprintData = ref<SprintFormData>({
   name: '',
   goal: '',
-  status: 'DONE',
+  status: 'NotActive',
   startDate: new Date(),
   finishDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
   scrumId: scrumStore.currentScrumId || ''
@@ -163,7 +169,7 @@ const validateDates = () => {
 
 const isEdit = computed(() => !!props.sprintId)
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validateDates()) return
   
   const now = new Date()
@@ -171,23 +177,28 @@ const handleSubmit = () => {
   const finishDate = new Date(sprintData.value.finishDate)
   
   if (now >= startDate && now <= finishDate) {
-    sprintData.value.status = 'ACTIVE'
+    sprintData.value.status = 'Active'
   } else if (now > finishDate) {
-    sprintData.value.status = 'DONE'
+    sprintData.value.status = 'Done'
   } else {
-    sprintData.value.status = 'DONE'
+    sprintData.value.status = 'NotActive'
   }
   
+  let success = false
+  
   if (isEdit.value && props.sprintId) {
-    sprintStore.updateSprint({
+    success = await sprintStore.updateSprint({
       ...sprintData.value,
       id: props.sprintId
     })
   } else {
-    sprintStore.addSprint(sprintData.value)
+    const result = await sprintStore.addSprint(sprintData.value)
+    success = !!result
   }
   
-  emit('submit')
+  if (success) {
+    emit('submit')
+  }
 }
 
 watch(() => sprintData.value.goal, () => {

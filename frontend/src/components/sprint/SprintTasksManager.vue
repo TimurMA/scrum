@@ -6,9 +6,9 @@
       <div class="flex items-center gap-2 mt-2">
         <span 
           class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-          :class="sprint.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+          :class="sprint.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
         >
-          {{ sprint.status === 'ACTIVE' ? 'Активен' : 'Завершен' }}
+          {{ sprint.status === 'Active' ? 'Активен' : 'Завершен' }}
         </span>
         <span class="text-sm text-gray-500">
           {{ formatDateRange(sprint.startDate, sprint.finishDate) }}
@@ -181,10 +181,7 @@ const backlogTasks = computed(() => {
 const sprintTasks = computed(() => {
   if (!props.sprintId) return []
   
-  const board = taskStore.boards.find(board => board.sprintId === props.sprintId)
-  if (!board) return []
-  
-  return taskStore.tasks.filter(task => task.boardId === board.id)
+  return taskStore.tasks.filter(task => task.sprintId === props.sprintId)
 })
 
 const filteredBacklogTasks = computed(() => {
@@ -238,13 +235,13 @@ const addTaskToSprint = (taskId: string) => {
   sprintStore.addTasksToSprint(props.sprintId, [taskId])
 }
 
-const removeTaskFromSprint = (taskId: string) => {
+const removeTaskFromSprint = async (taskId: string) => {
   const task = taskStore.getTaskById(taskId)
   if (task) {
-    taskStore.updateTask({
+    await taskStore.updateTask({
       ...task,
       status: 'InBackLog',
-      boardId: undefined
+      sprintId: undefined
     })
   }
 }

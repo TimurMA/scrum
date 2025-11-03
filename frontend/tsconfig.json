@@ -29,7 +29,7 @@
       "@components/*": ["./src/components/*"],
       "@composables/*": ["./src/composables/*"],
       "@stores/*": ["./src/stores/*"],
-      "@views/*": ["./src/views/*"],
+      "@views/*": ["./src/views/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],

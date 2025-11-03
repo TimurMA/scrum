@@ -5,38 +5,33 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, markRaw } from 'vue'
-import { useRoute } from 'vue-router'
-import MainLayout from '@/layouts/MainLayout.vue'
-import AuthLayout from '@/layouts/AuthLayout.vue'
-import { useAuthStore } from './stores/authStore'
-import { useScrumStore } from './stores/scrumStore'
-import { useSprintStore } from './stores/sprintStore'
-import { useTaskStore } from './stores/taskStore'
+import { computed, onMounted, markRaw } from "vue";
+import { useRoute } from "vue-router";
+import MainLayout from "@/layouts/MainLayout.vue";
+import AuthLayout from "@/layouts/AuthLayout.vue";
+import { useAuthStore } from "./stores/authStore";
+import { useScrumStore } from "./stores/scrumStore";
+import { useSprintStore } from "./stores/sprintStore";
+import { useTaskStore } from "./stores/taskStore";
 
-const route = useRoute()
-const authStore = useAuthStore()
-const scrumStore = useScrumStore()
-const sprintStore = useSprintStore()
-const taskStore = useTaskStore()
+const route = useRoute();
+const authStore = useAuthStore();
+const scrumStore = useScrumStore();
+const sprintStore = useSprintStore();
+const taskStore = useTaskStore();
 
 const layout = computed(() => {
-  if (route.path === '/login' || route.path === '/register') {
-    return markRaw(AuthLayout)
+  if (route.path === "/login" || route.path === "/register") {
+    return markRaw(AuthLayout);
   }
-  return markRaw(MainLayout)
-})
+  return markRaw(MainLayout);
+});
 
-onMounted(() => {
+onMounted(async () => {
   if (authStore.isAuthenticated()) {
-    authStore.fetchCurrentUser().then(() => {
-      authStore.initUsers()
-      scrumStore.initScrums()
-      sprintStore.initSprints()
-      taskStore.initTasks()
-    })
+    await authStore.fetchCurrentUser();
   }
-})
+});
 </script>
 
 <style>

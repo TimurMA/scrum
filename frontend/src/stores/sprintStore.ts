@@ -3,10 +3,13 @@ import { ref, computed, watch } from 'vue'
 import type { Sprint, SprintStatus } from '@/types'
 import { useScrumStore } from './scrumStore'
 import { useTaskStore } from './taskStore'
+import { sprintService } from '@/api/services/SprintService'
 
 export const useSprintStore = defineStore('sprint', () => {
   const sprints = ref<Sprint[]>([])
   const currentSprintId = ref<string | null>(null)
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
   
   const calculateSprintStatus = (sprint: Sprint): SprintStatus => {
     const now = new Date()
@@ -14,11 +17,11 @@ export const useSprintStore = defineStore('sprint', () => {
     const finishDate = new Date(sprint.finishDate)
     
     if (now >= startDate && now <= finishDate) {
-      return 'ACTIVE'
+      return 'Active'
     }
     
     if (now > finishDate) {
-      return 'DONE'
+      return 'Done'
     }
     
     return sprint.status
@@ -33,7 +36,7 @@ export const useSprintStore = defineStore('sprint', () => {
         goal: 'Реализовать основной функционал канбан-доски',
         startDate: new Date('2025-09-08'),
         finishDate: new Date('2025-09-15'),
-        status: 'DONE' as SprintStatus
+        status: 'Done' as SprintStatus
       },
       {
         id: '2',
@@ -42,7 +45,7 @@ export const useSprintStore = defineStore('sprint', () => {
         goal: 'Исправить баги и добавить интеграцию с API',
         startDate: new Date('2025-09-25'),
         finishDate: new Date('2025-10-15'),
-        status: 'DONE' as SprintStatus
+        status: 'Done' as SprintStatus
       },
       {
         id: '3',
@@ -51,7 +54,7 @@ export const useSprintStore = defineStore('sprint', () => {
         goal: 'Добавить функциональность экспорта данных',
         startDate: new Date('2025-10-09'),
         finishDate: new Date('2025-10-26'),
-        status: 'DONE' as SprintStatus
+        status: 'Done' as SprintStatus
       },
       {
         id: '4',
@@ -60,13 +63,13 @@ export const useSprintStore = defineStore('sprint', () => {
         goal: 'Улучшить пользовательский интерфейс',
         startDate: new Date('2025-10-23'),
         finishDate: new Date('2025-11-06'),
-        status: 'ACTIVE' as SprintStatus
+        status: 'Active' as SprintStatus
       }
     ]
     
     updateSprintStatuses()
     
-    const active = sprints.value.find(s => s.status === 'ACTIVE')
+    const active = sprints.value.find(s => s.status === 'Active')
     if (active) {
       currentSprintId.value = active.id
     }
@@ -82,7 +85,7 @@ export const useSprintStore = defineStore('sprint', () => {
     
     return sprints.value.find(sprint => 
       sprint.scrumId === scrumStore.currentScrumId && 
-      sprint.status === ('ACTIVE' as SprintStatus)
+      sprint.status === ('Active' as SprintStatus)
     ) || null
   })
   
@@ -93,8 +96,8 @@ export const useSprintStore = defineStore('sprint', () => {
     return sprints.value.filter(sprint => 
       sprint.scrumId === scrumStore.currentScrumId
     ).sort((a, b) => {
-      if (a.status === 'ACTIVE' && b.status !== 'ACTIVE') return -1
-      if (a.status !== 'ACTIVE' && b.status === 'ACTIVE') return 1
+      if (a.status === 'Active' && b.status !== 'Active') return -1
+      if (a.status !== 'Active' && b.status === 'Active') return 1
       return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
     })
   })
@@ -112,20 +115,43 @@ export const useSprintStore = defineStore('sprint', () => {
     return sprints.value.find(sprint => sprint.id === id)
   }
   
-  const addSprint = (sprint: Omit<Sprint, 'id'>): string => {
-    const newSprint: Sprint = {
-      ...sprint,
-      id: Date.now().toString()
+  const addSprint = async (sprint: Omit<Sprint, 'id'>): Promise<string | null> => {
+    try {
+      isLoading.value = true
+      error.value = null
+      
+      const newSprint = await sprintService.createSprint(sprint)
+      sprints.value.push(newSprint)
+      
+      return newSprint.id
+    } catch (err: any) {
+      error.value = err.message || 'Ошибка при создании спринта'
+      console.error('Error creating sprint:', err)
+      return null
+    } finally {
+      isLoading.value = false
     }
-    
-    sprints.value.push(newSprint)
-    return newSprint.id
   }
   
-  const updateSprint = (sprint: Sprint) => {
-    const index = sprints.value.findIndex(s => s.id === sprint.id)
-    if (index !== -1) {
-      sprints.value[index] = { ...sprint }
+  const updateSprint = async (sprint: Sprint): Promise<boolean> => {
+    try {
+      isLoading.value = true
+      error.value = null
+      
+      const updatedSprint = await sprintService.updateSprint(sprint)
+      
+      const index = sprints.value.findIndex(s => s.id === sprint.id)
+      if (index !== -1) {
+        sprints.value[index] = { ...updatedSprint }
+      }
+      
+      return true
+    } catch (err: any) {
+      error.value = err.message || 'Ошибка при обновлении спринта'
+      console.error('Error updating sprint:', err)
+      return false
+    } finally {
+      isLoading.value = false
     }
   }
   
@@ -134,12 +160,12 @@ export const useSprintStore = defineStore('sprint', () => {
     if (sprintIndex !== -1) {
       sprints.value[sprintIndex].status = status
       
-      if (status === 'ACTIVE') {
+      if (status === 'Active') {
         currentSprintId.value = sprintId
         
         sprints.value.forEach((s) => {
-          if (s.id !== sprintId && s.status === 'ACTIVE') {
-            s.status = 'DONE'
+          if (s.id !== sprintId && s.status === 'Active') {
+            s.status = 'Done'
           }
         })
       }
@@ -177,7 +203,7 @@ export const useSprintStore = defineStore('sprint', () => {
       const calculatedStatus = calculateSprintStatus(sprint)
       
       if (sprint.status !== calculatedStatus && 
-          !(calculatedStatus === 'ACTIVE' && sprint.status === 'DONE')) {
+          !(calculatedStatus === 'Active' && sprint.status === 'Done')) {
         sprint.status = calculatedStatus
       }
     })
@@ -193,13 +219,38 @@ export const useSprintStore = defineStore('sprint', () => {
     }, 3600000)
   }
 
+  const loadSprints = async (scrumId: string): Promise<void> => {
+    try {
+      isLoading.value = true
+      error.value = null
+      
+      const sprintsData = await sprintService.getAllSprints(scrumId)
+      sprints.value = sprintsData
+      
+      updateSprintStatuses()
+      
+      const active = sprints.value.find(s => s.status === 'Active')
+      if (active) {
+        currentSprintId.value = active.id
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Ошибка при загрузке спринтов'
+      console.error('Error loading sprints:', err)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     sprints,
     currentSprintId,
     currentSprint,
     scrumSprints,
     sprintTasks,
+    isLoading,
+    error,
     initSprints,
+    loadSprints,
     getSprintById,
     addSprint,
     updateSprint,

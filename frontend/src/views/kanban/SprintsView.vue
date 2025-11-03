@@ -74,9 +74,9 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span 
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
-                    :class="sprint.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                    :class="sprint.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
                   >
-                    {{ sprint.status === 'ACTIVE' ? 'Активен' : 'Завершен' }}
+                    {{ sprint.status === 'Active' ? 'Активен' : 'Завершен' }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -94,21 +94,21 @@
                       Редактировать
                     </button>
                     <button 
-                      v-if="sprint.status === 'DONE'" 
+                      v-if="sprint.status === 'NotActive'" 
                       @click="activateSprint(sprint.id)"
                       class="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 px-2 py-1 rounded"
                     >
                       Активировать
                     </button>
                     <button 
-                      v-if="sprint.status === 'ACTIVE'" 
+                      v-if="sprint.status === 'Active'" 
                       @click="completeSprint(sprint.id)"
                       class="text-yellow-600 hover:text-yellow-900 bg-yellow-50 hover:bg-yellow-100 px-2 py-1 rounded"
                     >
                       Завершить
                     </button>
                     <button 
-                      v-if="sprint.status === 'ACTIVE'" 
+                      v-if="sprint.status === 'Active'" 
                       @click="manageSprintTasks(sprint.id)"
                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded"
                     >
@@ -183,11 +183,11 @@ const filteredSprints = computed(() => {
 
 const statusLabel = computed(() => {
   switch (currentScrum.value?.status) {
-    case 'ACTIVE':
+    case 'Active':
       return 'Активен'
-    case 'DONE':
+    case 'Done':
       return 'Завершён'
-    case 'DELETED':
+    case 'Deleted':
       return 'Удалён'
     default:
       return ''
@@ -196,11 +196,11 @@ const statusLabel = computed(() => {
 
 const statusClass = computed(() => {
   switch (currentScrum.value?.status) {
-    case 'ACTIVE':
+    case 'Active':
       return 'text-green-600 font-medium'
-    case 'DONE':
+    case 'Done':
       return 'text-blue-600 font-medium'
-    case 'DELETED':
+    case 'Deleted':
       return 'text-red-600 font-medium'
     default:
       return ''
@@ -231,11 +231,11 @@ const closeSprintModal = () => {
 }
 
 const activateSprint = (sprintId: string) => {
-  sprintStore.updateSprintStatus(sprintId, 'ACTIVE')
+  sprintStore.updateSprintStatus(sprintId, 'Active')
 }
 
 const completeSprint = (sprintId: string) => {
-  sprintStore.updateSprintStatus(sprintId, 'DONE')
+  sprintStore.updateSprintStatus(sprintId, 'Done')
 }
 
 const manageSprintTasks = (sprintId: string) => {
@@ -249,15 +249,14 @@ const closeTasksModal = () => {
 
 const tabs = [
   { name: 'backlog', label: 'Бэклог', path: '/backlog' },
-  { name: 'board', label: 'Доска', path: '/board/1' },
+  { name: 'board', label: 'Доска', path: '/board' },
   { name: 'sprints', label: 'Спринты', path: '/sprints' }
 ]
 
-onMounted(() => {
-  if (!sprintStore.sprints.length) {
-    sprintStore.initSprints()
-  } else {
-    sprintStore.updateSprintStatuses()
+onMounted(async () => {
+  const scrumStore = useScrumStore()
+  if (scrumStore.currentScrumId) {
+    await sprintStore.loadSprints(scrumStore.currentScrumId)
   }
 })
 </script>

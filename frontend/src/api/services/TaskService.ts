@@ -49,6 +49,18 @@ export const taskService = {
         });
     },
 
+    // --- POST --- //
+    // Создание задачи
+    createTask: (taskData: Omit<Task, 'id' | 'createdAt'>): Promise<Task> => {
+        const payload = {
+            ...taskData,
+        };
+        return apiClient.post('/task/create', payload).then(response => ({
+            ...response.data,
+            createdAt: new Date(response.data.createdAt)
+        }));
+    },
+
     // --- DELETE --- //
     // Удаление задачи
     deleteTask: (taskId: string): Promise<void> => {

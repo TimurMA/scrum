@@ -10,37 +10,37 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@views/auth/LoginView.vue'),
+    component: () => import('../views/auth/LoginView.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('@views/auth/RegisterView.vue'),
+    component: () => import('../views/auth/RegisterView.vue'),
     meta: { requiresGuest: true }
   },
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('@views/profile/UserProfile.vue'),
+    component: () => import('../views/profile/UserProfile.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/board/:id',
+    path: '/board',
     name: 'KanbanBoard',
-    component: () => import('@views/kanban/KanbanBoard.vue'),
+    component: () => import('../views/kanban/KanbanBoard.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/backlog',
     name: 'Backlog',
-    component: () => import('@views/kanban/BacklogView.vue'),
+    component: () => import('../views/kanban/BacklogView.vue'),
     meta: { requiresAuth: true }
   },
   {
     path: '/sprints',
     name: 'Sprints',
-    component: () => import('@views/kanban/SprintsView.vue'),
+    component: () => import('../views/kanban/SprintsView.vue'),
     meta: { requiresAuth: true }
   }
 ]
@@ -52,7 +52,7 @@ const router = createRouter({
 
 router.beforeEach((
   to: RouteLocationNormalized,
-  from: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
   next: NavigationGuardNext
 ) => {
   const isAuthenticated = authService.isAuthenticated()

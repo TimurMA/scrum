@@ -23,37 +23,35 @@ export function useUserProfile() {
   
   const getStatusLabel = (status: ScrumStatus) => {
     switch(status) {
-      case 'ACTIVE': return 'Активен'
-      case 'DONE': return 'Завершён'
-      case 'DELETED': return 'Удалён'
+      case 'Active': return 'Активен'
+      case 'Done': return 'Завершён'
+      case 'Deleted': return 'Удалён'
       default: return ''
     }
   }
   
   const getStatusClass = (status: ScrumStatus) => {
     switch(status) {
-      case 'ACTIVE': return 'text-green-600'
-      case 'DONE': return 'text-blue-600'
-      case 'DELETED': return 'text-red-600'
+      case 'Active': return 'text-green-600'
+      case 'Done': return 'text-blue-600'
+      case 'Deleted': return 'text-red-600'
       default: return ''
     }
   }
   
   const navigateToScrum = (scrumId: string) => {
     scrumStore.currentScrumId = scrumId
-    
-    const board = taskStore.boards.find(b => b.id === scrumId) || 
-                { id: taskStore.addBoard('Доска ' + scrumId, undefined) }
-    
-    router.push(`/board/${board.id}`)
+    router.push('/board')
   }
   
-  const createScrum = () => {
-    const scrumId = scrumStore.addScrum(scrumForm.value.name)
+  const createScrum = async () => {
+    const scrumId = await scrumStore.addScrum(scrumForm.value.name)
     showScrumForm.value = false
     scrumForm.value = { name: '' }
     
-    navigateToScrum(scrumId)
+    if (scrumId) {
+      navigateToScrum(scrumId)
+    }
   }
   
   const closeOnOutsideClick = () => {

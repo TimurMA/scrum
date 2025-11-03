@@ -1,81 +1,85 @@
-import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useScrumStore } from '@stores/scrumStore'
-import { useTaskStore } from '@stores/taskStore'
-import { useSprintStore } from '@stores/sprintStore'
-import type { TaskStatus } from '@/types'
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useScrumStore } from "@stores/scrumStore";
+import { useTaskStore } from "@stores/taskStore";
+import { useSprintStore } from "@stores/sprintStore";
+import type { TaskStatus } from "@/types";
 
 export function useScrumBoard() {
-  const router = useRouter()
-  const route = useRoute()
-  
-  const scrumStore = useScrumStore()
-  const taskStore = useTaskStore()
-  const sprintStore = useSprintStore()
-  
-  const showTaskForm = ref(false)
-  const selectedTaskId = ref<string | undefined>(undefined)
-  
-  const initBoard = () => {
-    const boardId = route.params.id as string
-    if (boardId) {
-      taskStore.currentBoardId = boardId
-    }
-  }
-  
-  const columns = computed(() => taskStore.columns)
-  
-  const tasksByStatus = computed(() => taskStore.tasksByStatus)
-  
-  const board = computed(() => taskStore.currentBoard)
-  
-  const currentScrum = computed(() => scrumStore.currentScrum)
-  
+  const router = useRouter();
+  const route = useRoute();
+
+  const scrumStore = useScrumStore();
+  const taskStore = useTaskStore();
+  const sprintStore = useSprintStore();
+
+  const showTaskForm = ref(false);
+  const selectedTaskId = ref<string | undefined>(undefined);
+
+  const initBoard = () => {};
+
+  const columns = computed(() => taskStore.columns);
+
+  const tasksByStatus = computed(() => taskStore.tasksByStatus);
+
+  const board = computed(() => {
+    const currentSprint = sprintStore.currentSprint;
+    if (!currentSprint) return null;
+
+    return {
+      id: currentSprint.id,
+      title: `${currentSprint.name} - Kanban доска`,
+      sprintId: currentSprint.id,
+    };
+  });
+
+  const currentScrum = computed(() => scrumStore.currentScrum);
+
   const statusLabel = computed(() => {
     switch (currentScrum.value?.status) {
-      case 'ACTIVE':
-        return 'Активен'
-      case 'DONE':
-        return 'Завершён'
-      case 'DELETED':
-        return 'Удалён'
+      case "Active":
+        return "Активен";
+      case "Done":
+        return "Завершён";
+      case "Deleted":
+        return "Удалён";
       default:
-        return ''
+        return "";
     }
-  })
-  
+  });
+
   const statusClass = computed(() => {
     switch (currentScrum.value?.status) {
-      case 'ACTIVE':
-        return 'text-green-600 font-medium'
-      case 'DONE':
-        return 'text-blue-600 font-medium'
-      case 'DELETED':
-        return 'text-red-600 font-medium'
+      case "Active":
+        return "text-green-600 font-medium";
+      case "Done":
+        return "text-blue-600 font-medium";
+      case "Deleted":
+        return "text-red-600 font-medium";
       default:
-        return ''
+        return "";
     }
-  })
-  
-  const handleDropTask = (taskId: string, newStatus: TaskStatus) => {
-    taskStore.moveTask(taskId, newStatus)
-  }
-  
+  });
+
+  const handleDropTask = async (taskId: string, newStatus: TaskStatus) => {
+    await taskStore.moveTask(taskId, newStatus);
+  };
+
   const openTaskForm = (taskId?: string) => {
-    selectedTaskId.value = taskId
-    showTaskForm.value = true
-  }
-  
+    selectedTaskId.value = taskId;
+    showTaskForm.value = true;
+  };
+
   const closeTaskForm = () => {
-    showTaskForm.value = false
-    selectedTaskId.value = undefined
-  }
-  
+    showTaskForm.value = false;
+    selectedTaskId.value = undefined;
+  };
+
   const closeOnOutsideClick = () => {
-    showTaskForm.value = false
-    selectedTaskId.value = undefined
-  }
-  
+    showTaskForm.value = false;
+    selectedTaskId.value = undefined;
+  };
+
   return {
     showTaskForm,
     selectedTaskId,
@@ -89,6 +93,6 @@ export function useScrumBoard() {
     handleDropTask,
     openTaskForm,
     closeTaskForm,
-    closeOnOutsideClick
-  }
+    closeOnOutsideClick,
+  };
 }

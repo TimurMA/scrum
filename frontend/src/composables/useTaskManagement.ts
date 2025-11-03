@@ -15,7 +15,7 @@ export function useTaskManagement() {
     status: TaskStatus
     executorId: string
     taskTagId: string
-    boardId: string
+    sprintId: string
     scrumId: string
     creatorId: string
   }) => {
@@ -23,13 +23,13 @@ export function useTaskManagement() {
     error.value = null
     
     try {
-      const taskId = taskStore.addTask({
+      const taskId = await taskStore.addTask({
         title: taskData.title,
         description: taskData.description,
         status: taskData.status,
         executorId: taskData.executorId,
         taskTagId: taskData.taskTagId,
-        boardId: taskData.boardId,
+        sprintId: taskData.sprintId,
         scrumId: taskData.scrumId,
         creatorId: taskData.creatorId
       })
@@ -53,12 +53,12 @@ export function useTaskManagement() {
         throw new Error('Задача не найдена')
       }
       
-      taskStore.updateTask({
+      const success = await taskStore.updateTask({
         ...task,
         ...taskData
       })
       
-      return true
+      return success
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Ошибка при обновлении задачи'
       return false
@@ -72,8 +72,8 @@ export function useTaskManagement() {
     error.value = null
     
     try {
-      taskStore.moveTask(taskId, status)
-      return true
+      const success = await taskStore.moveTask(taskId, status)
+      return success
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Ошибка при изменении статуса задачи'
       return false

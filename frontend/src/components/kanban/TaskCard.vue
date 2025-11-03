@@ -73,7 +73,7 @@ const executorInitials = computed(() => {
   if (!props.task.executorId) return ''
   const user = authStore.getUserById(props.task.executorId)
   if (!user || !user.username) return ''
-  
+
   return user.username.substring(0, 2).toUpperCase()
 })
 

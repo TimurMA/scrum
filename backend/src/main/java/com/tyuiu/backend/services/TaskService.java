@@ -67,7 +67,9 @@ public class TaskService {
     }
 
     public Mono<Void> changeTask(TaskDTO taskDTO){
-        return template.update(taskMapper.toEntity(taskDTO)).then();
+        var sprint = taskMapper.toEntity(taskDTO);
+        sprint.setId(taskDTO.getId());
+        return template.update(sprint).then();
     }
 
     public Mono<Void> deleteTask(String taskId){

@@ -39,7 +39,7 @@ public class AuthenticationService {
                         request.getUsername(),
                         request.getPassword()
                 )
-        ).flatMap(authentication -> userService.findByUsername(request.getUsername())
+        ).flatMap(authentication -> userService.findUserByUsername(request.getUsername())
                 .flatMap(userDetails -> {
                     var jwt = jwtService.generateToken(userDetails);
                     return Mono.just(new JwtAuthResponse(jwt));

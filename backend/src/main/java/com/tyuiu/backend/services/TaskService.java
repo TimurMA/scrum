@@ -62,6 +62,10 @@ public class TaskService {
                                 })));
     }
 
+    public Mono<TaskDTO> createTask(TaskDTO taskDTO) {
+        return template.insert(taskMapper.toEntity(taskDTO)).map(taskMapper::toDTO);
+    }
+
     public Mono<Void> changeTask(TaskDTO taskDTO){
         return template.update(taskMapper.toEntity(taskDTO)).then();
     }

@@ -30,6 +30,12 @@ public class TaskController {
         return taskService.getSprintTasks(sprintId);
     }
 
+    @PostMapping("/create")
+    @Operation(summary = "Создание задания")
+    public Mono<TaskDTO> createTask(@RequestBody TaskDTO taskDTO) {
+        return taskService.createTask(taskDTO);
+    }
+
     @PutMapping("/change")
     @Operation(summary = "Изменение задачи")
     public Mono<Void> changeTask(@RequestBody TaskDTO taskDTO){

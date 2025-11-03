@@ -13,22 +13,47 @@
           @input="filterTags"
           autocomplete="off"
         />
-        <button
-          type="button"
-          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          @click="toggleDropdown"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
+        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+          <button
+            type="button"
+            class="text-gray-400 hover:text-gray-600"
+            v-if="inputValue !== ''"
+            @click="toggleColorPicker"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" :fill="pickedColor"/>
+            </svg>
+            
+          </button>
+
+          <button
+            type="button"
+            class="text-gray-400 hover:text-gray-600"
+            v-if="inputValue !== ''"
+            @click="saveTag"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM13 17L13 13H17V11H13V7H11V11H7V13H11V17H13Z" fill="currentColor"/>
+            </svg>
+          </button>
+          
+          <button
+            type="button"
+            class="text-gray-400 hover:text-gray-600"
+            @click="toggleDropdown"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
       </div>
-      
       <div
         v-if="showDropdown"
         class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-y-auto custom-scrollbar"
         @click.stop
       >
+
         <div
           v-for="(color, name) in predefinedTags"
           :key="name"
@@ -51,34 +76,49 @@
       </div>
     </div>
   </div>
+  <Vue3ColorPicker v-if="showColorPicker" type="HEX" v-model="pickedColor"/>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useTagManagement } from '@composables/useTagManagement'
+import { onMounted, ref, watch } from 'vue'
+import { Vue3ColorPicker } from '@cyhnkckali/vue3-color-picker';
+import { taskService } from '@/api/services/TaskService';
+import { TaskTag } from '@/types';
+
 
 const props = defineProps<{
   modelValue: string
   id: string
   label: string
   placeholder?: string
+  scrumId: string | null
 }>()
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const {
-  predefinedTags,
-  projectTags,
-  createTag,
-  getRandomTagColor
-} = useTagManagement()
+const projectTags = ref<TaskTag[]>([]) 
+const predefinedTags = ref<Record<string, string>>({})
 
 const inputValue = ref('')
 const showDropdown = ref(false)
 const filteredTags = ref<Array<any>>([])
 const tagExists = ref(false)
+const pickedColor = ref<string>("#FF0000")
+const showColorPicker = ref(false)
+
+onMounted(async () => {
+  const scrumId = props.scrumId
+  if (scrumId) {
+    projectTags.value = await taskService.getScrumTags(scrumId)
+
+    predefinedTags.value = projectTags.value.reduce((acc, tag) => {
+      acc[tag.name] = tag.color
+      return acc;
+    }, {} as Record<string, string>)
+  }
+})
 
 watch(() => props.modelValue, (newValue) => {
   const tag = projectTags.value.find(t => t.id === newValue)
@@ -111,6 +151,30 @@ const toggleDropdown = () => {
   }
 }
 
+const toggleColorPicker = () => {
+  showColorPicker.value = !showColorPicker.value
+}
+
+const saveTag = async () => {
+  const scrumId = props.scrumId
+  if (scrumId) {
+    const taskTag: TaskTag = {
+      id: "new",
+      scrumId,
+      color: pickedColor.value,
+      name: inputValue.value
+    }
+
+    const response = await taskService.createTag(taskTag)
+
+    if (response instanceof Error) {
+      console.log(response)
+    } else {
+      projectTags.value.push(taskTag)
+    }
+  }
+}
+ 
 const handleBlur = () => {
   setTimeout(() => {
     showDropdown.value = false
@@ -128,11 +192,7 @@ const handleBlur = () => {
     if (existingTag) {
       emit('update:modelValue', existingTag.id)
     } else {
-      createTag(input, getRandomTagColor()).then(newTagId => {
-        if (newTagId) {
-          emit('update:modelValue', newTagId)
-        }
-      })
+      
     }
   }, 200)
 }
@@ -157,15 +217,15 @@ const selectTag = async (tagName: string) => {
     let color: string
     
     if (Object.prototype.hasOwnProperty.call(predefinedTags, tagName)) {
-      color = predefinedTags[tagName]
+      color = predefinedTags.value[tagName]
     } else {
-      color = getRandomTagColor()
+      color = pickedColor.value
     }
     
-    const newTagId = await createTag(tagName, color)
-    if (newTagId) {
-      emit('update:modelValue', newTagId)
-    }
+    // const newTagId = await createTag(tagName, color)
+    // if (newTagId) {
+    //   emit('update:modelValue', newTagId)
+    // }
     
     showDropdown.value = false
   }

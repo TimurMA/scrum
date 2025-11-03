@@ -53,6 +53,7 @@
         v-model="taskData.taskTagId"
         label="Тег"
         placeholder="Выберите или введите свой тег"
+        :scrum-id="scrumStore.currentScrumId"
       />
 
       <div class="flex justify-end gap-2 mt-6">

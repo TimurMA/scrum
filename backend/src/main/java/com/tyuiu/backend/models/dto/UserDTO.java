@@ -11,5 +11,5 @@ public class UserDTO {
     private String id;
 
     private String email;
-    private String userName;
+    private String username;
 }

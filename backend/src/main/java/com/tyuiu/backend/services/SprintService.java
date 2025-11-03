@@ -46,9 +46,7 @@ public class SprintService {
 
     public Mono<Void> startSprint(String sprintId) {
         return template.update(query(where("id").is(sprintId).and(where("status").is(SprintStatus.Active))),
-                        update("status", SprintStatus.Done), Sprint.class)
-                .then(template.update(query(where("id").is(sprintId)),
-                update("status", SprintStatus.Active), Sprint.class)).then();
+                        update("status", SprintStatus.Done), Sprint.class).then();
     }
 
     public Mono<Void> completeSprint(String sprintId, String report) {

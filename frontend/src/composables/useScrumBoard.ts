@@ -35,7 +35,7 @@ export function useScrumBoard() {
     } else {
       return {
         id: "multi-sprint-board",
-        title: "Kanban доска - Множественные спринты",
+        title: "Kanban доска - Несколько активных спринтов",
         sprintId: activeSprints.map((s) => s.id).join(","),
       };
     }

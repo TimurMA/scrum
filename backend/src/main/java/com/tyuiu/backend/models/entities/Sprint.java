@@ -20,7 +20,7 @@ public class Sprint {
     private String name;
     private String goal;
     private String report;
-    private LocalDateTime startDate;
+    private LocalDateTime startDate = LocalDateTime.now();
     private LocalDateTime finishDate;
     private SprintStatus status;
 

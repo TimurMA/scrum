@@ -1,6 +1,8 @@
 <template>
   <div class="relative">
-    <label :for="id" class="block text-sm font-medium text-gray-700 mb-1">{{ label }}</label>
+    <label :for="id" class="block text-sm font-medium text-gray-700 mb-1">{{
+      label
+    }}</label>
     <div class="relative">
       <div class="flex">
         <input
@@ -13,17 +15,27 @@
           @input="filterTags"
           autocomplete="off"
         />
-        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+        <div
+          class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1"
+        >
           <button
             type="button"
             class="text-gray-400 hover:text-gray-600"
             v-if="inputValue !== ''"
             @click="toggleColorPicker"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" :fill="pickedColor"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                :fill="pickedColor"
+              />
             </svg>
-            
           </button>
 
           <button
@@ -32,18 +44,36 @@
             v-if="inputValue !== ''"
             @click="saveTag"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM13 17L13 13H17V11H13V7H11V11H7V13H11V17H13Z" fill="currentColor"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM13 17L13 13H17V11H13V7H11V11H7V13H11V17H13Z"
+                fill="currentColor"
+              />
             </svg>
           </button>
-          
+
           <button
             type="button"
             class="text-gray-400 hover:text-gray-600"
             @click="toggleDropdown"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
             </svg>
           </button>
         </div>
@@ -53,182 +83,188 @@
         class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-60 overflow-y-auto custom-scrollbar"
         @click.stop
       >
-
         <div
           v-for="(color, name) in predefinedTags"
           :key="name"
           class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
           @mousedown.prevent="selectTag(String(name))"
         >
-          <div class="w-3 h-3 rounded-full mr-2" :style="{ backgroundColor: color }"></div>
+          <div
+            class="w-3 h-3 rounded-full mr-2"
+            :style="{ backgroundColor: color }"
+          ></div>
           <span>{{ name }}</span>
         </div>
-        
+
         <div
           v-for="tag in filteredTags"
           :key="tag.id"
           class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
           @mousedown.prevent="selectTag(tag.name)"
         >
-          <div class="w-3 h-3 rounded-full mr-2" :style="{ backgroundColor: tag.color }"></div>
+          <div
+            class="w-3 h-3 rounded-full mr-2"
+            :style="{ backgroundColor: tag.color }"
+          ></div>
           <span>{{ tag.name }}</span>
         </div>
       </div>
     </div>
   </div>
-  <Vue3ColorPicker v-if="showColorPicker" type="HEX" v-model="pickedColor"/>
+  <Vue3ColorPicker v-if="showColorPicker" type="HEX" v-model="pickedColor" />
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { Vue3ColorPicker } from '@cyhnkckali/vue3-color-picker';
-import { taskService } from '@/api/services/TaskService';
-import { TaskTag } from '@/types';
-
+import { onMounted, ref, watch } from "vue";
+import { Vue3ColorPicker } from "@cyhnkckali/vue3-color-picker";
+import { taskService } from "@/api/services/TaskService";
+import { TaskTag } from "@/types";
 
 const props = defineProps<{
-  modelValue: string
-  id: string
-  label: string
-  placeholder?: string
-  scrumId: string | null
-}>()
+  modelValue: string;
+  id: string;
+  label: string;
+  placeholder?: string;
+  scrumId: string | null;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
-}>()
+  (e: "update:modelValue", value: string): void;
+}>();
 
-const projectTags = ref<TaskTag[]>([]) 
-const predefinedTags = ref<Record<string, string>>({})
+const projectTags = ref<TaskTag[]>([]);
+const predefinedTags = ref<Record<string, string>>({});
 
-const inputValue = ref('')
-const showDropdown = ref(false)
-const filteredTags = ref<Array<any>>([])
-const tagExists = ref(false)
-const pickedColor = ref<string>("#FF0000")
-const showColorPicker = ref(false)
+const inputValue = ref("");
+const showDropdown = ref(false);
+const filteredTags = ref<Array<any>>([]);
+const tagExists = ref(false);
+const pickedColor = ref<string>("#FF0000");
+const showColorPicker = ref(false);
 
 onMounted(async () => {
-  const scrumId = props.scrumId
+  const scrumId = props.scrumId;
   if (scrumId) {
-    projectTags.value = await taskService.getScrumTags(scrumId)
+    projectTags.value = await taskService.getScrumTags(scrumId);
 
     predefinedTags.value = projectTags.value.reduce((acc, tag) => {
-      acc[tag.name] = tag.color
+      acc[tag.name] = tag.color;
       return acc;
-    }, {} as Record<string, string>)
+    }, {} as Record<string, string>);
   }
-})
+});
 
-watch(() => props.modelValue, (newValue) => {
-  const tag = projectTags.value.find(t => t.id === newValue)
-  inputValue.value = tag ? tag.name : ''
-}, { immediate: true })
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    const tag = projectTags.value.find((t) => t.id === newValue);
+    inputValue.value = tag ? tag.name : "";
+  },
+  { immediate: true }
+);
 
 const filterTags = () => {
-  const input = inputValue.value.trim().toLowerCase()
-  
+  const input = inputValue.value.trim().toLowerCase();
+
   if (!input) {
-    filteredTags.value = projectTags.value.filter(tag => 
-      !Object.keys(predefinedTags).includes(tag.name)
-    )
+    filteredTags.value = projectTags.value.filter(
+      (tag) => !Object.keys(predefinedTags).includes(tag.name)
+    );
   } else {
-    filteredTags.value = projectTags.value.filter(tag => 
-      tag.name.toLowerCase().includes(input) &&
-      !Object.keys(predefinedTags).includes(tag.name)
-    )
+    filteredTags.value = projectTags.value.filter(
+      (tag) =>
+        tag.name.toLowerCase().includes(input) &&
+        !Object.keys(predefinedTags).includes(tag.name)
+    );
   }
-  
-  tagExists.value = !!projectTags.value.find(tag => 
-    tag.name.toLowerCase() === input
-  )
-}
+
+  tagExists.value = !!projectTags.value.find(
+    (tag) => tag.name.toLowerCase() === input
+  );
+};
 
 const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value
+  showDropdown.value = !showDropdown.value;
   if (showDropdown.value) {
-    filterTags()
+    filterTags();
   }
-}
+};
 
 const toggleColorPicker = () => {
-  showColorPicker.value = !showColorPicker.value
-}
+  showColorPicker.value = !showColorPicker.value;
+};
 
 const saveTag = async () => {
-  const scrumId = props.scrumId
+  const scrumId = props.scrumId;
   if (scrumId) {
-    const taskTag: TaskTag = {
-      id: "new",
+    const taskTag = {
       scrumId,
       color: pickedColor.value,
-      name: inputValue.value
-    }
+      name: inputValue.value,
+    };
 
-    const response = await taskService.createTag(taskTag)
+    const response = await taskService.createTag(taskTag);
 
     if (response instanceof Error) {
-      console.log(response)
+      console.log(response);
     } else {
-      projectTags.value.push(taskTag)
+      projectTags.value.push(response);
     }
   }
-}
- 
+};
+
 const handleBlur = () => {
   setTimeout(() => {
-    showDropdown.value = false
-    
-    const input = inputValue.value.trim()
+    showDropdown.value = false;
+
+    const input = inputValue.value.trim();
     if (!input) {
-      emit('update:modelValue', '')
-      return
+      emit("update:modelValue", "");
+      return;
     }
-    
-    const existingTag = projectTags.value.find(tag => 
-      tag.name.toLowerCase() === input.toLowerCase()
-    )
-    
+
+    const existingTag = projectTags.value.find(
+      (tag) => tag.name.toLowerCase() === input.toLowerCase()
+    );
+
     if (existingTag) {
-      emit('update:modelValue', existingTag.id)
+      emit("update:modelValue", existingTag.id);
     } else {
-      
     }
-  }, 200)
-}
+  }, 200);
+};
 
 const selectTag = async (tagName: string) => {
-  inputValue.value = tagName
-  
+  inputValue.value = tagName;
+
   if (!tagName) {
-    emit('update:modelValue', '')
-    showDropdown.value = false
-    return
+    emit("update:modelValue", "");
+    showDropdown.value = false;
+    return;
   }
-  
-  const existingTag = projectTags.value.find(tag => 
-    tag.name.toLowerCase() === tagName.toLowerCase()
-  )
-  
+
+  const existingTag = projectTags.value.find(
+    (tag) => tag.name.toLowerCase() === tagName.toLowerCase()
+  );
+
   if (existingTag) {
-    emit('update:modelValue', existingTag.id)
-    showDropdown.value = false
+    emit("update:modelValue", existingTag.id);
+    showDropdown.value = false;
   } else {
-    let color: string
-    
+    let color: string;
+
     if (Object.prototype.hasOwnProperty.call(predefinedTags, tagName)) {
-      color = predefinedTags.value[tagName]
+      color = predefinedTags.value[tagName];
     } else {
-      color = pickedColor.value
+      color = pickedColor.value;
     }
-    
+
     // const newTagId = await createTag(tagName, color)
     // if (newTagId) {
     //   emit('update:modelValue', newTagId)
     // }
-    
-    showDropdown.value = false
-  }
-}
-</script>
 
+    showDropdown.value = false;
+  }
+};
+</script>

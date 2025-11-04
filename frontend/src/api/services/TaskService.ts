@@ -7,7 +7,6 @@ export const taskService = {
   changeTask: (taskData: Task): Promise<void> => {
     const payload = {
       ...taskData,
-      createdAt: taskData.createdAt.toISOString(),
     };
     return apiClient.put("/task/change", payload);
   },
@@ -48,28 +47,9 @@ export const taskService = {
 
   // Получение всех задач для доски (сгруппированные по статусу)
   getBoardTasks: (scrumId: string): Promise<Record<TaskStatus, Task[]>> => {
-    return apiClient.get(`/task/board/${scrumId}`).then((response) => {
-      // Преобразуем GroupedFlux в объект с группировкой по статусу
-      const groupedTasks: Record<TaskStatus, Task[]> = {
-        InBackLog: [],
-        NewTask: [],
-        InProgress: [],
-        OnVerification: [],
-        Done: [],
-      };
-
-      // Обрабатываем ответ от бэкенда
-      response.data.forEach((group: any) => {
-        const status = group.key as TaskStatus;
-        const tasks = group.values.map((task: any) => ({
-          ...task,
-          createdAt: new Date(task.createdAt),
-        }));
-        groupedTasks[status] = tasks;
-      });
-
-      return groupedTasks;
-    });
+    return apiClient
+      .get(`/task/board/${scrumId}`)
+      .then((response) => response.data);
   },
 
   // --- DELETE --- //

@@ -38,7 +38,7 @@ public class SprintService {
 
     public Mono<SprintDTO> updateSprint(SprintDTO sprintDTO) {
         var sprint = sprintMapper.toEntity(sprintDTO);
-        sprint.setId(sprint.getId());
+        sprint.setId(sprintDTO.getId());
         return template.update(sprint)
                 .flatMap(updated -> template.selectOne(query(where("id").is(sprint.getId())), Sprint.class))
                 .map(sprintMapper::toDTO);

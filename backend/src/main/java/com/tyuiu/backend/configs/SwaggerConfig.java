@@ -23,9 +23,9 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Your API")
+                        .title("Scrum API")
                         .version("1.0")
-                        .description("API documentation"))
+                        .description("API documentation for scrum"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
                                 new io.swagger.v3.oas.models.security.SecurityScheme()

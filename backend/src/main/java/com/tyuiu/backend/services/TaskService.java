@@ -108,7 +108,7 @@ public class TaskService {
         return Mono.just(taskDTO)
                 .map(dto -> {
                     Task task = taskMapper.toEntity(dto);
-                    dto.setCreatedAt(LocalDateTime.now());
+                    task.setCreatedAt(LocalDateTime.now());
                     return task;
                 })
                 .flatMap(template::insert)

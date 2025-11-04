@@ -23,14 +23,22 @@ export function useScrumBoard() {
   const tasksByStatus = computed(() => taskStore.tasksByStatus);
 
   const board = computed(() => {
-    const currentSprint = sprintStore.currentSprint;
-    if (!currentSprint) return null;
+    const activeSprints = sprintStore.activeSprints;
+    if (activeSprints.length === 0) return null;
 
-    return {
-      id: currentSprint.id,
-      title: `${currentSprint.name} - Kanban доска`,
-      sprintId: currentSprint.id,
-    };
+    if (activeSprints.length === 1) {
+      return {
+        id: activeSprints[0].id,
+        title: `${activeSprints[0].name} - Kanban доска`,
+        sprintId: activeSprints[0].id,
+      };
+    } else {
+      return {
+        id: "multi-sprint-board",
+        title: "Kanban доска - Множественные спринты",
+        sprintId: activeSprints.map((s) => s.id).join(","),
+      };
+    }
   });
 
   const currentScrum = computed(() => scrumStore.currentScrum);

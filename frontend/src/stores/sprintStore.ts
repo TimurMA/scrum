@@ -7,7 +7,7 @@ import { sprintService } from "@/api/services/SprintService";
 
 export const useSprintStore = defineStore("sprint", () => {
   const sprints = ref<Sprint[]>([]);
-  const currentSprintId = ref<string | null>(null);
+  const activeSprintIds = ref<string[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -69,30 +69,24 @@ export const useSprintStore = defineStore("sprint", () => {
 
     updateSprintStatuses();
 
-    const active = sprints.value.find((s) => s.status === "Active");
-    if (active) {
-      currentSprintId.value = active.id;
-    }
+    activeSprintIds.value = sprints.value
+      .filter((s) => s.status === "Active")
+      .map((s) => s.id);
   };
 
-  const currentSprint = computed(() => {
-    if (currentSprintId.value) {
-      return (
-        sprints.value.find((sprint) => sprint.id === currentSprintId.value) ||
-        null
-      );
-    }
-
+  const activeSprints = computed(() => {
     const scrumStore = useScrumStore();
-    if (!scrumStore.currentScrumId) return null;
+    if (!scrumStore.currentScrumId) return [];
 
-    return (
-      sprints.value.find(
-        (sprint) =>
-          sprint.scrumId === scrumStore.currentScrumId &&
-          sprint.status === ("Active" as SprintStatus)
-      ) || null
+    return sprints.value.filter(
+      (sprint) =>
+        sprint.scrumId === scrumStore.currentScrumId &&
+        sprint.status === ("Active" as SprintStatus)
     );
+  });
+
+  const currentSprint = computed(() => {
+    return activeSprints.value.length > 0 ? activeSprints.value[0] : null;
   });
 
   const scrumSprints = computed(() => {
@@ -111,11 +105,13 @@ export const useSprintStore = defineStore("sprint", () => {
   });
 
   const sprintTasks = computed(() => {
-    if (!currentSprint.value) return [];
+    if (activeSprints.value.length === 0) return [];
 
     const taskStore = useTaskStore();
+    const activeSprintIds = activeSprints.value.map((sprint) => sprint.id);
+
     return taskStore.tasks.filter(
-      (task) => task.sprintId === currentSprint.value?.id
+      (task) => task.sprintId && activeSprintIds.includes(task.sprintId)
     );
   });
 
@@ -171,13 +167,14 @@ export const useSprintStore = defineStore("sprint", () => {
       sprints.value[sprintIndex].status = status;
 
       if (status === "Active") {
-        currentSprintId.value = sprintId;
-
-        sprints.value.forEach((s) => {
-          if (s.id !== sprintId && s.status === "Active") {
-            s.status = "Done";
-          }
-        });
+        if (!activeSprintIds.value.includes(sprintId)) {
+          activeSprintIds.value.push(sprintId);
+        }
+      } else {
+        const activeIndex = activeSprintIds.value.indexOf(sprintId);
+        if (activeIndex > -1) {
+          activeSprintIds.value.splice(activeIndex, 1);
+        }
       }
     }
   };
@@ -245,10 +242,9 @@ export const useSprintStore = defineStore("sprint", () => {
 
       updateSprintStatuses();
 
-      const active = sprints.value.find((s) => s.status === "Active");
-      if (active) {
-        currentSprintId.value = active.id;
-      }
+      activeSprintIds.value = sprints.value
+        .filter((s) => s.status === "Active")
+        .map((s) => s.id);
     } catch (err: any) {
       error.value = err.message || "Ошибка при загрузке спринтов";
       console.error("Error loading sprints:", err);
@@ -267,14 +263,13 @@ export const useSprintStore = defineStore("sprint", () => {
 
       await sprintService.completeSprint(sprintId, report);
 
-      // Обновить локальное состояние после успешного API вызова
       const sprintIndex = sprints.value.findIndex((s) => s.id === sprintId);
       if (sprintIndex !== -1) {
         sprints.value[sprintIndex].status = "Done";
 
-        // Очистить текущий спринт если он был завершён
-        if (currentSprintId.value === sprintId) {
-          currentSprintId.value = null;
+        const activeIndex = activeSprintIds.value.indexOf(sprintId);
+        if (activeIndex > -1) {
+          activeSprintIds.value.splice(activeIndex, 1);
         }
       }
 
@@ -295,18 +290,13 @@ export const useSprintStore = defineStore("sprint", () => {
 
       await sprintService.startSprint(sprintId);
 
-      // Обновить локальное состояние после успешного API вызова
       const sprintIndex = sprints.value.findIndex((s) => s.id === sprintId);
       if (sprintIndex !== -1) {
         sprints.value[sprintIndex].status = "Active";
-        currentSprintId.value = sprintId;
 
-        // Завершить все остальные активные спринты
-        sprints.value.forEach((s) => {
-          if (s.id !== sprintId && s.status === "Active") {
-            s.status = "Done";
-          }
-        });
+        if (!activeSprintIds.value.includes(sprintId)) {
+          activeSprintIds.value.push(sprintId);
+        }
       }
 
       return true;
@@ -321,7 +311,8 @@ export const useSprintStore = defineStore("sprint", () => {
 
   return {
     sprints,
-    currentSprintId,
+    activeSprintIds,
+    activeSprints,
     currentSprint,
     scrumSprints,
     sprintTasks,

@@ -123,6 +123,28 @@ export const useTaskStore = defineStore("task", () => {
         executorId: authStore.users[0]!.id,
       },
     ];
+
+    // Инициализируем теги для демонстрационных данных
+    taskTags.value = [
+      {
+        id: "1",
+        name: "Фронтенд",
+        color: "#3b82f6",
+        scrumId: "1",
+      },
+      {
+        id: "2",
+        name: "Бекенд",
+        color: "#dc2626",
+        scrumId: "1",
+      },
+      {
+        id: "3",
+        name: "Документация",
+        color: "#16a34a",
+        scrumId: "1",
+      },
+    ];
   };
 
   const currentBoard = computed(() => {
@@ -147,11 +169,17 @@ export const useTaskStore = defineStore("task", () => {
     result["InBackLog"] = backlogTasks;
 
     const sprintStore = useSprintStore();
-    const currentSprint = sprintStore.currentSprint;
+    const activeSprints = sprintStore.activeSprints;
 
-    if (currentSprint) {
+    if (activeSprints.length > 0) {
+      const activeSprintIds = activeSprints.map((sprint) => sprint.id);
+
       tasks.value.forEach((task) => {
-        if (task.sprintId === currentSprint.id && task.status !== "InBackLog") {
+        if (
+          task.sprintId &&
+          activeSprintIds.includes(task.sprintId) &&
+          task.status !== "InBackLog"
+        ) {
           if (!result[task.status]) {
             result[task.status] = [];
           }
@@ -283,11 +311,23 @@ export const useTaskStore = defineStore("task", () => {
       });
 
       tasks.value = allTasks;
+
+      // Также загружаем теги для этого скрама
+      await loadTags(scrumId);
     } catch (err: any) {
       error.value = err.message || "Ошибка при загрузке задач";
       console.error("Error loading tasks:", err);
     } finally {
       isLoading.value = false;
+    }
+  };
+
+  const loadTags = async (scrumId: string): Promise<void> => {
+    try {
+      const tagsData = await taskService.getScrumTags(scrumId);
+      taskTags.value = tagsData;
+    } catch (err: any) {
+      console.error("Error loading tags:", err);
     }
   };
 
@@ -303,6 +343,7 @@ export const useTaskStore = defineStore("task", () => {
     error,
     initTasks,
     loadTasks,
+    loadTags,
     moveTask,
     addTask,
     updateTask,

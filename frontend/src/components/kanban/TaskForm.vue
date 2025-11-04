@@ -169,7 +169,8 @@ const handleSubmit = async () => {
     let sprintId: string | undefined = undefined;
     if (props.context === "board") {
       const sprintStore = useSprintStore();
-      sprintId = sprintStore.currentSprint?.id;
+      const activeSprints = sprintStore.activeSprints;
+      sprintId = activeSprints.length > 0 ? activeSprints[0].id : undefined;
     }
 
     await taskStore.addTask({

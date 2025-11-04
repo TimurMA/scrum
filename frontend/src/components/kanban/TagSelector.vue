@@ -84,19 +84,6 @@
         @click.stop
       >
         <div
-          v-for="(color, name) in predefinedTags"
-          :key="name"
-          class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-          @mousedown.prevent="selectTag(String(name))"
-        >
-          <div
-            class="w-3 h-3 rounded-full mr-2"
-            :style="{ backgroundColor: color }"
-          ></div>
-          <span>{{ name }}</span>
-        </div>
-
-        <div
           v-for="tag in filteredTags"
           :key="tag.id"
           class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
@@ -115,9 +102,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { Vue3ColorPicker } from "@cyhnkckali/vue3-color-picker";
 import { taskService } from "@/api/services/TaskService";
+import { useTaskStore } from "@stores/taskStore";
 import { TaskTag } from "@/types";
 
 const props = defineProps<{
@@ -132,8 +120,9 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
 
-const projectTags = ref<TaskTag[]>([]);
-const predefinedTags = ref<Record<string, string>>({});
+const taskStore = useTaskStore();
+
+const projectTags = computed(() => taskStore.taskTags);
 
 const inputValue = ref("");
 const showDropdown = ref(false);
@@ -145,12 +134,11 @@ const showColorPicker = ref(false);
 onMounted(async () => {
   const scrumId = props.scrumId;
   if (scrumId) {
-    projectTags.value = await taskService.getScrumTags(scrumId);
+    if (taskStore.taskTags.length === 0) {
+      await taskStore.loadTags(scrumId);
+    }
 
-    predefinedTags.value = projectTags.value.reduce((acc, tag) => {
-      acc[tag.name] = tag.color;
-      return acc;
-    }, {} as Record<string, string>);
+    filterTags();
   }
 });
 
@@ -163,18 +151,22 @@ watch(
   { immediate: true }
 );
 
+watch(
+  projectTags,
+  () => {
+    filterTags();
+  },
+  { deep: true }
+);
+
 const filterTags = () => {
   const input = inputValue.value.trim().toLowerCase();
 
   if (!input) {
-    filteredTags.value = projectTags.value.filter(
-      (tag) => !Object.keys(predefinedTags).includes(tag.name)
-    );
+    filteredTags.value = projectTags.value;
   } else {
-    filteredTags.value = projectTags.value.filter(
-      (tag) =>
-        tag.name.toLowerCase().includes(input) &&
-        !Object.keys(predefinedTags).includes(tag.name)
+    filteredTags.value = projectTags.value.filter((tag) =>
+      tag.name.toLowerCase().includes(input)
     );
   }
 
@@ -208,7 +200,11 @@ const saveTag = async () => {
     if (response instanceof Error) {
       console.log(response);
     } else {
-      projectTags.value.push(response);
+      taskStore.taskTags.push(response);
+
+      filterTags();
+
+      emit("update:modelValue", response.id);
     }
   }
 };
@@ -249,22 +245,8 @@ const selectTag = async (tagName: string) => {
 
   if (existingTag) {
     emit("update:modelValue", existingTag.id);
-    showDropdown.value = false;
-  } else {
-    let color: string;
-
-    if (Object.prototype.hasOwnProperty.call(predefinedTags, tagName)) {
-      color = predefinedTags.value[tagName];
-    } else {
-      color = pickedColor.value;
-    }
-
-    // const newTagId = await createTag(tagName, color)
-    // if (newTagId) {
-    //   emit('update:modelValue', newTagId)
-    // }
-
-    showDropdown.value = false;
   }
+
+  showDropdown.value = false;
 };
 </script>

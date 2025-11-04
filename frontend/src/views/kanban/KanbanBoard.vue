@@ -10,6 +10,16 @@
             Проект: {{ currentScrum.name }} |
             <span :class="statusClass">{{ statusLabel }}</span>
           </p>
+          <p
+            class="text-sm mt-1"
+            :class="
+              activeSprints.length > 0
+                ? 'text-green-600 font-medium'
+                : 'text-gray-500'
+            "
+          >
+            {{ activeSprintsInfo }}
+          </p>
         </div>
 
         <BaseButton variant="primary" @click="openTaskForm">
@@ -83,6 +93,17 @@ const tabs = [
 
 const visibleColumns = computed(() => {
   return columns.value.filter((column) => column.status !== "InBackLog");
+});
+
+const activeSprints = computed(() => sprintStore.activeSprints);
+
+const activeSprintsInfo = computed(() => {
+  const count = activeSprints.value.length;
+  if (count === 0) return "Нет активных спринтов";
+  if (count === 1) return `Активный спринт: ${activeSprints.value[0].name}`;
+  return `Активных спринтов: ${count} (${activeSprints.value
+    .map((s) => s.name)
+    .join(", ")})`;
 });
 
 onMounted(async () => {

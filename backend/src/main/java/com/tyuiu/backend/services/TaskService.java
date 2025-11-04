@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,7 +106,11 @@ public class TaskService {
 
     public Mono<TaskDTO> createTask(TaskDTO taskDTO) {
         return Mono.just(taskDTO)
-                .map(taskMapper::toEntity)
+                .map(dto -> {
+                    Task task = taskMapper.toEntity(dto);
+                    dto.setCreatedAt(LocalDateTime.now());
+                    return task;
+                })
                 .flatMap(template::insert)
                 .flatMap(this::enrichTaskWithRelations)
                 .doOnSuccess(createdTask -> {

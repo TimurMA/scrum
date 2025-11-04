@@ -22,7 +22,7 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
     private String creatorId;
     private String executorId;
 }

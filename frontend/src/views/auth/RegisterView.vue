@@ -89,15 +89,22 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
-import BaseButton from '@/components/common/BaseButton.vue';
+import { useAuthStore } from '@stores/authStore';
+import BaseButton from '@components/common/BaseButton.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const loading = ref(false);
 const error = ref('');
 
-const form = reactive({
+interface RegisterForm {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+const form = reactive<RegisterForm>({
   username: '',
   email: '',
   password: '',
@@ -118,7 +125,21 @@ const handleRegister = async () => {
     await authStore.register(form.username, form.email, form.password);
     router.push({ name: 'Profile' });
   } catch (err: any) {
-    error.value = err.message || 'Ошибка при регистрации. Пожалуйста, попробуйте снова.';
+    if (err.response?.status === 409) {
+      if (err.response.data?.message?.includes('username')) {
+        error.value = 'Пользователь с таким именем уже существует';
+      } else if (err.response.data?.message?.includes('email')) {
+        error.value = 'Пользователь с таким email уже существует';
+      } else {
+        error.value = 'Пользователь с такими данными уже существует';
+      }
+    } else if (err.response?.status === 400) {
+      error.value = 'Некорректные данные для регистрации';
+    } else if (err.response?.status >= 500) {
+      error.value = 'Сервис временно недоступен. Попробуйте позже.';
+    } else {
+      error.value = err.message || 'Ошибка при регистрации. Пожалуйста, попробуйте снова.';
+    }
   } finally {
     loading.value = false;
   }

@@ -83,9 +83,12 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useUserProfile } from "@composables/useUserProfile";
 import BaseButton from "@components/common/BaseButton.vue";
 import BaseModal from "@components/common/BaseModal.vue";
+
+import { useScrumStore } from "@stores/scrumStore";
 
 const {
   showScrumForm,
@@ -98,8 +101,11 @@ const {
   createScrum,
 } = useUserProfile();
 
-import { useScrumStore } from "@stores/scrumStore";
 const scrumStore = useScrumStore();
+
+onMounted(async () => { 
+  await scrumStore.loadScrums();
+})
 </script>
 
 <style scoped>

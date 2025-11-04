@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collection;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/task")
@@ -23,7 +25,7 @@ public class TaskController {
 
     @GetMapping("/board/{scrumId}")
     @Operation(summary = "Получение всех задач для доски")
-    public Flux<GroupedFlux<TaskStatus, TaskDTO>> getBoardTasks(@PathVariable String scrumId) {
+    public Mono<Map<TaskStatus, Collection<TaskDTO>>> getBoardTasks(@PathVariable String scrumId) {
         return taskService.getBoardTasks(scrumId);
     }
 
@@ -53,13 +55,13 @@ public class TaskController {
 
     @PutMapping("/change")
     @Operation(summary = "Изменение задачи")
-    public Mono<Void> changeTask(@RequestBody TaskDTO taskDTO){
-        return taskService.changeTask(taskDTO);
+    public Mono<TaskDTO> updateTask(@RequestBody TaskDTO taskDTO){
+        return taskService.updateTask(taskDTO);
     }
 
-    @DeleteMapping("/delete/{taskId}")
+    @DeleteMapping("/delete/{scrumId}/{taskId}")
     @Operation(summary = "Удаление задачи")
-    public Mono<Void> deleteTask(@PathVariable String taskId){
-        return taskService.deleteTask(taskId);
+    public Mono<Void> deleteTask(@PathVariable String scrumId, @PathVariable String taskId){
+        return taskService.deleteTask(scrumId, taskId);
     }
 }

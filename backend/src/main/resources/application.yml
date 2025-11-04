@@ -1,7 +1,17 @@
 spring:
+  rsocket:
+    server:
+      port: 7000
+      transport: tcp
+      mapping-path: /api
   application:
     name: backend
   r2dbc:
+    pool:
+      enabled: true
+      initial-size: 10
+      max-idle-time: 1m
+      max-size: 30
     url: r2dbc:h2:file:///./data/scrum-db
     username: su
     password: su

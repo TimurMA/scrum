@@ -16,7 +16,7 @@ import java.util.List;
 public class SpaWebFilter implements WebFilter {
 
     private final List<String> excludedPaths = Arrays.asList(
-            "/api/", "/actuator/", "/swagger", "/v2/", "/v3/", "/webjars/"
+            "/api/", "/actuator/", "/swagger", "/v2/", "/v3/", "/webjars/", "/api"
     );
 
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {

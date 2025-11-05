@@ -27,6 +27,8 @@ export interface Scrum {
 export interface ScrumMember {
   scrumId: string;
   userEmail: string;
+  username?: string;
+  userId?: string;
   startDate: Date;
   finishDate?: Date;
 }

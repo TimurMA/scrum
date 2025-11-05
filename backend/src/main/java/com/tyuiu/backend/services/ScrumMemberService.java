@@ -1,8 +1,11 @@
 package com.tyuiu.backend.services;
 
 import com.tyuiu.backend.models.dto.ScrumMemberDTO;
+import com.tyuiu.backend.models.entities.Scrum;
 import com.tyuiu.backend.models.entities.ScrumMember;
+import com.tyuiu.backend.models.entities.Task;
 import com.tyuiu.backend.models.entities.User;
+import com.tyuiu.backend.models.enums.TaskStatus;
 import com.tyuiu.backend.models.mappers.ScrumMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -35,7 +38,7 @@ public class ScrumMemberService {
                                 return template.selectOne(query(where("email").is(scrumMemberDTO.getUserEmail())), User.class)
                                         .flatMap(user -> {
                                             scrumMemberDTO.setUserId(user.getId());
-                                            scrumMemberDTO.setUserName(user.getUsername());
+                                            scrumMemberDTO.setUsername(user.getUsername());
                                             return Mono.just(scrumMemberDTO);
                                         });
                             }
@@ -45,16 +48,32 @@ public class ScrumMemberService {
                 .filter(scrumMemberDTO -> scrumMemberDTO.getUserId() != null);
     }
 
-    public Mono<Void> addMembers(Flux<String> emails, String scrumId) {
+    public Flux<ScrumMemberDTO> addMembers(Flux<String> emails, String scrumId) {
         return emails
-                .flatMap(e -> template.insert(ScrumMember
-                            .builder().scrumId(scrumId).userEmail(e).build()))
-                .then();
+                .flatMap(e -> template.exists(query(where("user_email").is(e)
+                        .and(where("scrum_id").is(scrumId))), ScrumMember.class)
+                        .filter(exists -> !exists)
+                        .flatMap(exists -> template.insert(ScrumMember
+                                .builder().scrumId(scrumId).userEmail(e).build())))
+                .map(scrumMapper::toDTO);
     }
 
     public Mono<Void> kickMember(String email, String scrumId) {
-        return template.update(query(where("email").is(email)),
-                update("finish_date", LocalDateTime.now()), ScrumMember.class).then();
+        return template.update(query(where("user_email").is(email)
+                        .and("scrum_id").is(scrumId)),
+                update("finish_date", LocalDateTime.now()), ScrumMember.class).then(
+                        template.selectOne(query(where("id").is(scrumId)), Scrum.class)
+                                .flatMap(s -> template.selectOne(query(where("email").is(email)), User.class)
+                                .flatMap(user -> {
+                                    if (user != null) {
+                                        return template.update(query(where("executor_id").is(user.getId())
+                                                .and("scrum_id").is(scrumId).and("status")
+                                                .is(TaskStatus.InProgress)), update("status", TaskStatus.InBackLog)
+                                                .set("executor_id", s.getCreatorId()), Task.class).then();
+                                    }
+                                    return Mono.empty();
+                                }))
+        );
     }
 
 }

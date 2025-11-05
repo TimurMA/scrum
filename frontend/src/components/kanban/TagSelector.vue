@@ -106,7 +106,6 @@ import { onMounted, ref, watch, computed } from "vue";
 import { Vue3ColorPicker } from "@cyhnkckali/vue3-color-picker";
 import { taskService } from "@/api/services/TaskService";
 import { useTaskStore } from "@stores/taskStore";
-import { TaskTag } from "@/types";
 
 const props = defineProps<{
   modelValue: string;

@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Scrum, ScrumStatus } from "@/types";
+import type { Scrum, ScrumMember, ScrumStatus } from "@/types";
 import { scrumService } from "@/api/services/ScrumService";
 import { useAuthStore } from "./authStore";
 
 export const useScrumStore = defineStore("scrum", () => {
   const scrums = ref<Scrum[]>([]);
+  const scrumMembers = ref<ScrumMember[]>([]);
   const currentScrumId = ref<string | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -94,8 +95,51 @@ export const useScrumStore = defineStore("scrum", () => {
     }
   };
 
+  const fetchScrumMembers = async (scrumId: string): Promise<void> => {
+    try {
+      const response = await scrumService.getScrumMembers(scrumId);
+      scrumMembers.value = response;
+    } catch (err: any) {
+      console.error("Error loading scrums:", err);
+      error.value = "Ошибка при загрузке участников";
+    }
+  };
+
+  const addScrumMembers = async (
+    scrumId: string,
+    emails: string[]
+  ): Promise<void> => {
+    try {
+      const response = await scrumService.addMembers(scrumId, emails);
+      scrumMembers.value.push(...response);
+    } catch (err: any) {
+      console.error("Error loading scrums:", err);
+      error.value = "Ошибка при добавлении участников";
+    }
+  };
+
+  const kickScrumMember = async (
+    scrumId: string,
+    userEmail: string
+  ): Promise<void> => {
+    try {
+      await scrumService.kickMember(scrumId, userEmail);
+      const index = scrumMembers.value.findIndex(
+        (m) => m.userEmail === userEmail
+      );
+
+      if (index === -1) {
+        scrumMembers.value.splice(index, 1);
+      }
+    } catch (err: any) {
+      console.error("Error loading scrums:", err);
+      error.value = "Ошибка при добавлении участников";
+    }
+  };
+
   return {
     scrums,
+    scrumMembers,
     currentScrumId,
     currentScrum,
     userScrums,
@@ -105,5 +149,8 @@ export const useScrumStore = defineStore("scrum", () => {
     loadScrums,
     addScrum,
     updateScrumStatus,
+    fetchScrumMembers,
+    addScrumMembers,
+    kickScrumMember,
   };
 });

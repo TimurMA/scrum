@@ -55,7 +55,7 @@ public class ScrumController {
 
     @PostMapping("/members/add/{scrumId}")
     @Operation(summary = "Добавление пользователей")
-    public Mono<Void> addMembers(@RequestBody Flux<String> emails, @PathVariable String scrumId) {
+    public Flux<ScrumMemberDTO> addMembers(@RequestBody Flux<String> emails, @PathVariable String scrumId) {
         return scrumMemberService.addMembers(emails, scrumId);
     }
 

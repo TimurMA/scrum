@@ -137,6 +137,10 @@ export const useScrumStore = defineStore("scrum", () => {
     }
   };
 
+  const getScrumMemberById = (scrumMemberId: string) => {
+    return scrumMembers.value.find((scrumMember: ScrumMember) => scrumMember.userId  === scrumMemberId)
+  }
+
   return {
     scrums,
     scrumMembers,
@@ -152,5 +156,6 @@ export const useScrumStore = defineStore("scrum", () => {
     fetchScrumMembers,
     addScrumMembers,
     kickScrumMember,
+    getScrumMemberById,
   };
 });

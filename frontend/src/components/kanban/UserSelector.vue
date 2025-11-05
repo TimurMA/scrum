@@ -12,12 +12,12 @@
       >
         <div class="flex items-center">
           <div
-            v-if="selectedUser"
+            v-if="selectedScrumMember"
             class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mr-2 text-sm"
           >
-            {{ selectedUser.initials }}
+            {{ selectedScrumMember.initials }}
           </div>
-          <span>{{ selectedUser ? selectedUser.username : placeholder }}</span>
+          <span>{{ selectedScrumMember ? selectedScrumMember.username : placeholder }}</span>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -39,17 +39,17 @@
         @click.stop
       >
         <div
-          v-for="user in users"
-          :key="user.id"
+          v-for="scrumMember in scrumMembers"
+          :key="scrumMember.userId"
           class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-          @mousedown.prevent="selectUser(user.id)"
+          @mousedown.prevent="selectScrumMember(scrumMember.userId!)"
         >
           <div
             class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mr-2 text-sm"
           >
-            {{ getUserInitials(user) }}
+            {{ getScrumMemberInitials(scrumMember) }}
           </div>
-          <span>{{ user.username }}</span>
+          <span>{{ scrumMember.username }}</span>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { useAuthStore } from "@stores/authStore";
+import { useScrumStore } from "@stores/scrumStore";
 
 const props = defineProps<{
   modelValue: string;
@@ -71,24 +71,24 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
 
-const authStore = useAuthStore();
+const scrumStore = useScrumStore();
 const showDropdown = ref(false);
 
-const users = computed(() => authStore.users);
+const scrumMembers = computed(() => scrumStore.scrumMembers);
 
-const selectedUser = computed(() => {
-  const user = authStore.getUserById(props.modelValue);
-  if (!user) return null;
+const selectedScrumMember = computed(() => {
+  const scrumMember = scrumStore.getScrumMemberById(props.modelValue);
+  if (!scrumMember) return null;
 
   return {
-    ...user,
-    initials: getUserInitials(user),
+    ...scrumMember,
+    initials: getScrumMemberInitials(scrumMember),
   };
 });
 
-const getUserInitials = (user: any): string => {
-  if (!user || !user.username) return "";
-  const username = user.username.trim();
+const getScrumMemberInitials = (scrumMember: any): string => {
+  if (!scrumMember || !scrumMember.username) return "";
+  const username = scrumMember.username.trim();
   if (!username) return "";
 
   return username.substring(0, 2).toUpperCase();
@@ -98,8 +98,8 @@ const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;
 };
 
-const selectUser = (userId: string) => {
-  emit("update:modelValue", userId);
+const selectScrumMember = (scrumMemberId: string) => {
+  emit("update:modelValue", scrumMemberId);
   showDropdown.value = false;
 };
 

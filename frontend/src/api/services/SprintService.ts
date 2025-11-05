@@ -30,9 +30,7 @@ export const sprintService = {
 
   // Завершение спринта
   completeSprint: (sprintId: string, report: string): Promise<void> => {
-    return apiClient.patch(`/sprint/complete/${sprintId}`, report, {
-      headers: { "Content-Type": "text/plain" },
-    });
+    return apiClient.patch(`/sprint/complete/${sprintId}`, report);
   },
 
   // --- GET --- //

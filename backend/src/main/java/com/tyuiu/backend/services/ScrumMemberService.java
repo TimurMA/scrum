@@ -48,31 +48,38 @@ public class ScrumMemberService {
                 .filter(scrumMemberDTO -> scrumMemberDTO.getUserId() != null);
     }
 
-    public Flux<ScrumMemberDTO> addMembers(Flux<String> emails, String scrumId) {
-        return emails
+    public Mono<ScrumMemberDTO> addMembers(String email, String scrumId) {
+        return Mono.just(email)
                 .flatMap(e -> template.exists(query(where("user_email").is(e)
-                        .and(where("scrum_id").is(scrumId))), ScrumMember.class)
-                        .filter(exists -> !exists)
-                        .flatMap(exists -> template.insert(ScrumMember
-                                .builder().scrumId(scrumId).userEmail(e).build())))
-                .map(scrumMapper::toDTO);
+                        .and(where("scrum_id").is(scrumId)).and("finish_date").isNull()), ScrumMember.class)
+                        .flatMap(exists -> {
+                            if (exists) {
+                                return Mono.error(new RuntimeException("Пользователь уже в команде"));
+                            }
+                            return template.insert(ScrumMember
+                                    .builder().scrumId(scrumId).userEmail(e).build())
+                                    .map(scrumMapper::toDTO)
+                                    .flatMap(sm -> template
+                                            .selectOne(query(where("email").is(e)), User.class)
+                                            .flatMap(user -> {
+                                                sm.setUsername(user.getUsername());
+                                                sm.setUserId(user.getId());
+                                                return Mono.just(sm);
+                                            }));
+                        })
+                );
     }
 
     public Mono<Void> kickMember(String email, String scrumId) {
         return template.update(query(where("user_email").is(email)
-                        .and("scrum_id").is(scrumId)),
+                        .and("scrum_id").is(scrumId).and("finish_date").isNull()),
                 update("finish_date", LocalDateTime.now()), ScrumMember.class).then(
                         template.selectOne(query(where("id").is(scrumId)), Scrum.class)
                                 .flatMap(s -> template.selectOne(query(where("email").is(email)), User.class)
-                                .flatMap(user -> {
-                                    if (user != null) {
-                                        return template.update(query(where("executor_id").is(user.getId())
-                                                .and("scrum_id").is(scrumId).and("status")
-                                                .is(TaskStatus.InProgress)), update("status", TaskStatus.InBackLog)
-                                                .set("executor_id", s.getCreatorId()), Task.class).then();
-                                    }
-                                    return Mono.empty();
-                                }))
+                                .flatMap(user -> template.update(query(where("executor_id").is(user.getId())
+                                        .and("scrum_id").is(scrumId).and("status")
+                                        .is(TaskStatus.InProgress)), update("status", TaskStatus.InBackLog)
+                                        .set("executor_id", s.getCreatorId()), Task.class).then()))
         );
     }
 

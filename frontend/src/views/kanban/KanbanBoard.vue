@@ -22,6 +22,17 @@
           </p>
         </div>
 
+        <BaseButton
+          v-if="
+            authStore.currentUser?.id === scrumStore.currentScrum?.creatorId
+          "
+          variant="primary"
+          @click="toggleManageMembersForm"
+        >
+          <span class="text-lg mr-1">+</span>
+          Добавить участников
+        </BaseButton>
+
         <BaseButton variant="primary" @click="openTaskForm">
           <span class="text-lg mr-1">+</span>
           Добавить задачу
@@ -40,6 +51,10 @@
       </div>
     </div>
 
+    <BaseModal v-model="showManageMembersForm" title="Участники">
+      <ManageMembersForm @cancel="toggleManageMembersForm"> </ManageMembersForm>
+    </BaseModal>
+
     <BaseModal v-model="showTaskForm" title="Задача">
       <TaskForm
         :task-id="selectedTaskId"
@@ -52,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref } from "vue";
 import { useScrumBoard } from "@composables/useScrumBoard";
 import KanbanColumn from "@components/kanban/KanbanColumn.vue";
 import TaskForm from "@components/kanban/TaskForm.vue";
@@ -64,11 +79,18 @@ import { useTaskStore } from "@stores/taskStore";
 import { useScrumStore } from "@stores/scrumStore";
 import { useAuthStore } from "@stores/authStore";
 import { useSprintStore } from "@stores/sprintStore";
+import ManageMembersForm from "@/components/common/ManageMembersForm.vue";
 
 const taskStore = useTaskStore();
 const scrumStore = useScrumStore();
 const authStore = useAuthStore();
 const sprintStore = useSprintStore();
+
+const showManageMembersForm = ref<boolean>(false);
+
+function toggleManageMembersForm() {
+  showManageMembersForm.value = !showManageMembersForm.value;
+}
 
 const {
   showTaskForm,
@@ -113,6 +135,7 @@ onMounted(async () => {
     await Promise.all([
       sprintStore.loadSprints(scrumStore.currentScrumId),
       taskStore.loadTasks(scrumStore.currentScrumId),
+      scrumStore.fetchScrumMembers(scrumStore.currentScrumId),
     ]);
   }
 

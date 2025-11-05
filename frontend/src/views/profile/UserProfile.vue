@@ -103,9 +103,9 @@ const {
 
 const scrumStore = useScrumStore();
 
-onMounted(async () => { 
+onMounted(async () => {
   await scrumStore.loadScrums();
-})
+});
 </script>
 
 <style scoped>

@@ -1,5 +1,6 @@
 package com.tyuiu.backend.controllers;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.tyuiu.backend.models.dto.ScrumDTO;
 import com.tyuiu.backend.models.dto.ScrumMemberDTO;
 import com.tyuiu.backend.models.entities.User;
@@ -54,9 +55,9 @@ public class ScrumController {
     }
 
     @PostMapping("/members/add/{scrumId}")
-    @Operation(summary = "Добавление пользователей")
-    public Flux<ScrumMemberDTO> addMembers(@RequestBody Flux<String> emails, @PathVariable String scrumId) {
-        return scrumMemberService.addMembers(emails, scrumId);
+    @Operation(summary = "Добавление пользователя")
+    public Mono<ScrumMemberDTO> addMember(@RequestBody TextNode email, @PathVariable String scrumId) {
+        return scrumMemberService.addMembers(email.asText(), scrumId);
     }
 
     @PostMapping("/create")
@@ -68,8 +69,8 @@ public class ScrumController {
 
     @PutMapping("/members/kick/{scrumId}")
     @Operation(summary = "Удаление пользователя")
-    public Mono<Void> addMembers(@RequestBody String email, @PathVariable String scrumId) {
-        return scrumMemberService.kickMember(email, scrumId);
+    public Mono<Void> kickMember(@RequestBody TextNode email, @PathVariable String scrumId) {
+        return scrumMemberService.kickMember(email.asText(), scrumId);
     }
 
     @DeleteMapping("/delete/{scrumId}")

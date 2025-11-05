@@ -17,7 +17,9 @@
           >
             {{ selectedScrumMember.initials }}
           </div>
-          <span>{{ selectedScrumMember ? selectedScrumMember.username : placeholder }}</span>
+          <span>{{
+            selectedScrumMember ? selectedScrumMember.username : placeholder
+          }}</span>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -40,11 +42,12 @@
       >
         <div
           v-for="scrumMember in scrumMembers"
-          :key="scrumMember.userId"
+          :key="scrumMember.userEmail"
           class="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
-          @mousedown.prevent="selectScrumMember(scrumMember.userId!)"
+          @mousedown.prevent="selectScrumMember(scrumMember.userEmail)"
         >
           <div
+            v-if="scrumMember.username"
             class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center mr-2 text-sm"
           >
             {{ getScrumMemberInitials(scrumMember) }}

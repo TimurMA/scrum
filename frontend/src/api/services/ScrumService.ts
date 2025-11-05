@@ -5,15 +5,15 @@ export const scrumService = {
   // --- PUT --- //
   // Удаление пользователя из скрама
   kickMember: (scrumId: string, email: string): Promise<void> => {
-    return apiClient.put(`/scrum/members/kick/${scrumId}`, email, {
-      headers: { "Content-Type": "text/plain" },
-    });
+    return apiClient.put(`/scrum/members/kick/${scrumId}`, email);
   },
 
   // --- POST --- //
   // Добавление пользователей в скрам
-  addMembers: (scrumId: string, emails: string[]): Promise<ScrumMember[]> => {
-    return apiClient.post(`/scrum/members/add/${scrumId}`, emails);
+  addMember: (scrumId: string, email: string): Promise<ScrumMember> => {
+    return apiClient
+      .post(`/scrum/members/add/${scrumId}`, email)
+      .then((response) => response.data);
   },
 
   // Создание скрама

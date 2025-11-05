@@ -25,7 +25,8 @@ public class ScrumService {
     }
 
     public Flux<ScrumDTO> getAllScrums(String userEmail) {
-        return template.select(query(where("user_email").is(userEmail)), ScrumMember.class)
+        return template.select(query(where("user_email").is(userEmail)
+                        .and("finish_date").isNull()), ScrumMember.class)
                 .flatMap(scrumMember -> template
                         .selectOne(query(where("id").is(scrumMember.getScrumId())), Scrum.class))
                 .map(scrumMapper::toDTO);

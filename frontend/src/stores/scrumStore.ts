@@ -38,9 +38,7 @@ export const useScrumStore = defineStore("scrum", () => {
     const authStore = useAuthStore();
     if (!authStore.currentUser) return [];
 
-    return scrums.value.filter(
-      (scrum: Scrum) => scrum.creatorId === authStore.currentUser?.id
-    );
+    return scrums.value;
   });
 
   const addScrum = async (name: string): Promise<string | null> => {
@@ -107,11 +105,11 @@ export const useScrumStore = defineStore("scrum", () => {
 
   const addScrumMembers = async (
     scrumId: string,
-    emails: string[]
+    email: string
   ): Promise<void> => {
     try {
-      const response = await scrumService.addMembers(scrumId, emails);
-      scrumMembers.value.push(...response);
+      const response = await scrumService.addMember(scrumId, email);
+      scrumMembers.value.push(response);
     } catch (err: any) {
       console.error("Error loading scrums:", err);
       error.value = "Ошибка при добавлении участников";
@@ -120,16 +118,14 @@ export const useScrumStore = defineStore("scrum", () => {
 
   const kickScrumMember = async (
     scrumId: string,
-    userEmail: string
+    email: string
   ): Promise<void> => {
     try {
-      await scrumService.kickMember(scrumId, userEmail);
-      const index = scrumMembers.value.findIndex(
-        (m) => m.userEmail === userEmail
-      );
+      await scrumService.kickMember(scrumId, email);
+      const index = scrumMembers.value.findIndex((m) => m.userEmail === email);
 
       if (index === -1) {
-        scrumMembers.value.splice(index, 1);
+        scrumMembers.value = scrumMembers.value.splice(index, 1);
       }
     } catch (err: any) {
       console.error("Error loading scrums:", err);
@@ -138,8 +134,10 @@ export const useScrumStore = defineStore("scrum", () => {
   };
 
   const getScrumMemberById = (scrumMemberId: string) => {
-    return scrumMembers.value.find((scrumMember: ScrumMember) => scrumMember.userId  === scrumMemberId)
-  }
+    return scrumMembers.value.find(
+      (scrumMember: ScrumMember) => scrumMember.userId === scrumMemberId
+    );
+  };
 
   return {
     scrums,

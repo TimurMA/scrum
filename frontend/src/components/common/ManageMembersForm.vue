@@ -24,6 +24,7 @@ onMounted(async () => {
     userStore.initUsers();
     scrumStore.fetchScrumMembers(scrumId);
     members.value = scrumStore.scrumMembers;
+
     notMembers.value = userStore.users.filter(
       (user) =>
         members.value.findIndex((m) => m.userEmail === user.email) === -1
@@ -36,7 +37,7 @@ function validateEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-function addMemberByEmail() {
+async function addMemberByEmail() {
   emailError.value = "";
 
   if (!emailField.value.trim()) {
@@ -49,7 +50,6 @@ function addMemberByEmail() {
     return;
   }
 
-  // Проверяем, нет ли уже пользователя с таким email в участниках
   const existingMember = members.value.find(
     (member) =>
       member.userEmail.toLowerCase() === emailField.value.toLowerCase()
@@ -60,25 +60,14 @@ function addMemberByEmail() {
     return;
   }
 
-  // Проверяем, существует ли пользователь в системе
-  const userExists = userStore.users.find(
-    (user) => user.email.toLowerCase() === emailField.value.toLowerCase()
-  );
-
-  if (!userExists) {
-    emailError.value = "Пользователь с таким email не найден";
-    return;
-  }
-
-  // Добавляем пользователя
-  addMembers([emailField.value]);
+  await addMembers(emailField.value);
   emailField.value = "";
 }
 
-const addMembers = async (emails: string[]) => {
+const addMembers = async (email: string) => {
   const scrumId = useScrumStore().currentScrumId;
   if (scrumId) {
-    await scrumStore.addScrumMembers(scrumId, emails);
+    await scrumStore.addScrumMembers(scrumId, email);
     members.value = scrumStore.scrumMembers;
     notMembers.value = userStore.users.filter(
       (user) =>
@@ -129,8 +118,7 @@ const kickMember = async (email: string) => {
           <div v-if="emailError" class="form-error">{{ emailError }}</div>
 
           <div class="email-hint">
-            Введите email зарегистрированного пользователя и нажмите "Добавить"
-            или Enter
+            Введите email и нажмите "Добавить" или Enter
           </div>
 
           <div class="available-users">
@@ -140,7 +128,6 @@ const kickMember = async (email: string) => {
                 class="user-item"
                 v-for="user in notMembers"
                 :key="user.email"
-                @click="addMembers([user.email])"
               >
                 <div class="user-info">
                   <div class="user-name">
@@ -150,7 +137,11 @@ const kickMember = async (email: string) => {
                     {{ user.email }}
                   </div>
                 </div>
-                <button class="user-add-btn" title="Добавить в команду">
+                <button
+                  @click="addMembers(user.email)"
+                  class="user-add-btn"
+                  title="Добавить в команду"
+                >
                   +
                 </button>
               </div>

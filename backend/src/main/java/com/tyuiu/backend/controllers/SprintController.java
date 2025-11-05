@@ -1,5 +1,6 @@
 package com.tyuiu.backend.controllers;
 
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.tyuiu.backend.models.dto.SprintDTO;
 import com.tyuiu.backend.services.SprintService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,8 +50,8 @@ public class SprintController {
     @PatchMapping("/complete/{sprintId}")
     @Operation(summary = "Завершение спринта")
     public Mono<Void> completeSprint(@PathVariable String sprintId,
-                                     @RequestBody String report) {
-        return sprintService.completeSprint(sprintId, report);
+                                     @RequestBody TextNode report) {
+        return sprintService.completeSprint(sprintId, report.asText());
     }
 
     @DeleteMapping("/delete/{sprintId}")

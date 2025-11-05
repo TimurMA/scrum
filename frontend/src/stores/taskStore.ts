@@ -5,6 +5,7 @@ import { useScrumStore } from "./scrumStore";
 import { useSprintStore } from "./sprintStore";
 import { useAuthStore } from "./authStore";
 import { taskService } from "@/api/services/TaskService";
+import useRSocket from "@/composables/useRSocket";
 
 export const useTaskStore = defineStore("task", () => {
   const tasks = ref<Task[]>([]);
@@ -13,6 +14,59 @@ export const useTaskStore = defineStore("task", () => {
   const currentBoardId = ref<string | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+
+  const closeRSocketReceivingTasks = ref<() => void>(() => {
+    return;
+  });
+  const closeRSocketReceivingDeletingTask = ref<() => void>(() => {
+    return;
+  });
+  const isRSocketReceivingTasksConnected = ref(false);
+  const isRSocketReceivningDeletedTaskIdConnected = ref(false);
+
+  const connectToReceivingTasks = async (scrumId: string) => {
+    const { isConnected, closeConnection } = await useRSocket(
+      `tasks.receive.${scrumId}`,
+      (data: any) => {
+        if (data instanceof Array) {
+          tasks.value.push(...data);
+        } else {
+          tasks.value.push(data);
+        }
+      }
+    );
+
+    if (isConnected) {
+      closeRSocketReceivingTasks.value = closeConnection;
+      isRSocketReceivingTasksConnected.value = true;
+    }
+  };
+
+  const connectToReceivingDeletedTaskId = async (scrumId: string) => {
+    const { isConnected, closeConnection } = await useRSocket(
+      `tasks.deletions.${scrumId}`,
+      (data) => {
+        if (data instanceof Array) {
+          data.forEach((id) => {
+            const index = tasks.value.findIndex((t) => t.id === id);
+            if (index != -1) {
+              tasks.value = tasks.value.slice(index, 1);
+            }
+          });
+        } else {
+          const index = tasks.value.findIndex((t) => t.id === data);
+          if (index != -1) {
+            tasks.value = tasks.value.slice(index, 1);
+          }
+        }
+      }
+    );
+
+    if (isConnected) {
+      closeRSocketReceivingDeletingTask.value = closeConnection;
+      isRSocketReceivningDeletedTaskIdConnected.value = true;
+    }
+  };
 
   const columns = ref([
     {
@@ -341,6 +395,12 @@ export const useTaskStore = defineStore("task", () => {
     tasksByStatus,
     isLoading,
     error,
+    isRSocketReceivingTasksConnected,
+    isRSocketReceivningDeletedTaskIdConnected,
+    closeRSocketReceivingTasks,
+    closeRSocketReceivingDeletingTask,
+    connectToReceivingTasks,
+    connectToReceivingDeletedTaskId,
     initTasks,
     loadTasks,
     loadTags,

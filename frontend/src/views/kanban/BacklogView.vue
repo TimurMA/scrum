@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import TaskCard from "@components/kanban/TaskCard.vue";
 import TaskForm from "@components/kanban/TaskForm.vue";

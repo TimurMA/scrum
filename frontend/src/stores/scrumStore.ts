@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { Scrum, ScrumMember, ScrumStatus } from "@/types";
+import type { Scrum, ScrumMember, ScrumStatus, Task } from "@/types";
 import { scrumService } from "@/api/services/ScrumService";
 import { useAuthStore } from "./authStore";
+import useRSocket from "@composables/useRSocket";
 
 export const useScrumStore = defineStore("scrum", () => {
   const scrums = ref<Scrum[]>([]);

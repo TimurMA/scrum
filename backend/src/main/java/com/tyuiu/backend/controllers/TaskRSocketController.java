@@ -10,12 +10,11 @@ import reactor.core.publisher.Flux;
 
 @Controller
 @RequiredArgsConstructor
-@MessageMapping("tasks")
 public class TaskRSocketController {
 
     private final TaskService taskService;
 
-    @MessageMapping("receive.{scrumId}")
+    @MessageMapping("tasks.receive.{scrumId}")
     public Flux<TaskDTO> receiveTasksByScrumId(@DestinationVariable String scrumId) {
         return taskService.getTaskUpdates().filter(taskDTO -> taskDTO.getScrumId().equals(scrumId));
     }

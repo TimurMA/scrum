@@ -1,8 +1,8 @@
 spring:
   rsocket:
     server:
-      port: 7000
-      transport: tcp
+      port: 7010
+      transport: websocket
       mapping-path: /api
   application:
     name: backend

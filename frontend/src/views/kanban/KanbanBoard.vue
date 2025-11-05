@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, onUnmounted } from "vue";
 import { useScrumBoard } from "@composables/useScrumBoard";
 import KanbanColumn from "@components/kanban/KanbanColumn.vue";
 import TaskForm from "@components/kanban/TaskForm.vue";
@@ -136,10 +136,22 @@ onMounted(async () => {
       sprintStore.loadSprints(scrumStore.currentScrumId),
       taskStore.loadTasks(scrumStore.currentScrumId),
       scrumStore.fetchScrumMembers(scrumStore.currentScrumId),
+      taskStore.connectToReceivingTasks(scrumStore.currentScrumId),
+      taskStore.connectToReceivingDeletedTaskId(scrumStore.currentScrumId),
     ]);
   }
 
   initBoard();
+});
+
+onUnmounted(() => {
+  if (taskStore.isRSocketReceivingTasksConnected) {
+    taskStore.closeRSocketReceivingTasks;
+  }
+
+  if (taskStore.isRSocketReceivingTasksConnected) {
+    taskStore.closeRSocketReceivingDeletingTask;
+  }
 });
 </script>
 

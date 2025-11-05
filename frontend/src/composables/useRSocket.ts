@@ -3,12 +3,28 @@ import {
   RSocketClient,
   JsonSerializer,
   IdentitySerializer,
+  MESSAGE_RSOCKET_COMPOSITE_METADATA,
+  BufferEncoders,
+  encodeAndAddCustomMetadata,
+  encodeAndAddWellKnownMetadata,
+  MESSAGE_RSOCKET_ROUTING,
 } from "rsocket-core";
-import TcpClientTransport from "rsocket-tcp-client";
+import RSocketWebSocketClient from "rsocket-websocket-client";
 
-async function useRSocket<Type>(subscribeUrl: string, socketData?: Type) {
-  const data = ref<Type>() as Ref<Type>;
+function bearerToken(token: string): Buffer {
+  const buffer = Buffer.alloc(1 + token.length);
+  buffer.writeUInt8(1 | 0x80, 0);
+  buffer.write(token, 1, "utf-8");
+  return buffer;
+}
+
+export default async function useRSocket(
+  subscribeUrl: string,
+  callback: (data: any) => void
+) {
   const isConnected = ref(false);
+  let socket: any = null;
+  let subscription: any = null;
 
   const client = new RSocketClient({
     serializers: {
@@ -19,50 +35,60 @@ async function useRSocket<Type>(subscribeUrl: string, socketData?: Type) {
       keepAlive: 60000,
       lifetime: 180000,
       dataMimeType: "application/json",
-      metadataMimeType: "message/x.rsocket.routing.v0",
+      metadataMimeType: MESSAGE_RSOCKET_COMPOSITE_METADATA.string,
     },
-    transport: new TcpClientTransport({
-      host: "localhost",
-      port: 8080,
-    }),
+    transport: new RSocketWebSocketClient(
+      {
+        url: "ws://localhost:8080/api",
+      },
+      BufferEncoders
+    ),
   });
 
   function closeConnection() {
-    client.close();
+    if (subscription) {
+      subscription.cancel();
+    }
+    if (socket) {
+      socket.close();
+    }
+    isConnected.value = false;
   }
 
-  await new Promise((resolve, reject) => {
-    client.connect().then(
-      (socket) => {
-        resolve((isConnected.value = true));
+  try {
+    isConnected.value = true;
 
-        socket
-          .requestStream({
-            metadata: String.fromCharCode(subscribeUrl.length) + subscribeUrl,
-          })
-          .subscribe({
-            onError: (error) => reject(error),
-            onNext: (payload) => {
-              if (socketData instanceof Array) {
-                socketData.push(payload.data);
-              } else {
-                socketData = payload.data;
-              }
+    (await client.connect())
+      .requestStream({
+        metadata: encodeAndAddCustomMetadata(
+          encodeAndAddWellKnownMetadata(
+            Buffer.alloc(0),
+            MESSAGE_RSOCKET_ROUTING,
+            Buffer.from(String.fromCharCode(subscribeUrl.length) + subscribeUrl)
+          ),
+          "message/x.rsocket.authentication.bearer.v0",
+          bearerToken(localStorage.getItem("auth-token") || "")
+        ),
+      })
+      .subscribe({
+        onError: (error) => {
+          console.error("RSocket error:", error);
+          isConnected.value = false;
+        },
+        onNext: (payload) => {
+          console.log("Received payload:", payload);
+          callback(payload.data);
+        },
+        onSubscribe: (sub) => {
+          console.log("Subscribed to:", subscribeUrl);
+          sub.request(2147483647);
+        },
+      });
+  } catch (error) {
+    console.error("Connection failed:", error);
+    isConnected.value = false;
+    throw error;
+  }
 
-              if (data.value instanceof Array) {
-                data.value.push(payload.data);
-              } else {
-                data.value = payload.data;
-              }
-            },
-            onSubscribe: (subscirbe) => subscirbe.request(1000),
-          });
-      },
-      (error) => reject(error)
-    );
-  });
-
-  return { data, isConnected, closeConnection };
+  return { isConnected, closeConnection };
 }
-
-export default useRSocket;

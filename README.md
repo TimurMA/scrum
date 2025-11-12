@@ -1,10 +1,10 @@
-java 21 required 
+Для запуска проекта необходима java 21 версии - https://www.oracle.com/europe/java/technologies/downloads/#java21
 
-For Windows
+Запуск сайта для Windows
 ```powershell
 .\gradlew clean build bootRun -x test
 ```
-For linux/macOS
+Запуск сайта для Linux/MacOS
 ```bash
 ./gradlew clean build bootRun -x test
 

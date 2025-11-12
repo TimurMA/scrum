@@ -12,7 +12,7 @@ cd scrum
 ```powershell
 .\gradlew clean build bootRun -x test
 ```
-Запуск сайта для Linux/MacOS
+  Запуск сайта для Linux/MacOS
 ```bash
 ./gradlew clean build bootRun -x test
 
